@@ -446,10 +446,146 @@ function FormSubmitCard() {
 }
 ```
 
+## Component Structure Convention
+
+**CRITICAL: Separate smart components (features) from dumb components (components):**
+
+### Directory Structure
+
+```
+components/                   # DUMB COMPONENTS (presentational only)
+  ├── {ComponentName}/        # Component folder in PascalCase
+  │   ├── index.tsx          # Main component (props in, UI out)
+  │   ├── styles.ts          # Styled components (all styled() calls)
+  │   └── types.ts           # Optional: component-specific types
+
+features/                     # SMART COMPONENTS (business logic + state)
+  ├── {FeatureName}/         # Feature name in PascalCase (e.g., Home, FormBuilder)
+  │   ├── index.tsx          # Main feature integration/export
+  │   ├── styles.ts          # Styled components (all styled() calls)
+  │   ├── SubComponent1.tsx  # Feature-specific sub-components
+  │   ├── SubComponent2.tsx
+  │   └── types.ts           # Optional: feature-specific types
+```
+
+### Smart vs Dumb Components
+
+**Dumb Components (components/):**
+- ✅ Pure presentational components
+- ✅ Receive data via props only
+- ✅ No state management (except UI state like hover, focus)
+- ✅ No business logic
+- ✅ Reusable across features
+- ✅ Examples: Button, Field, Section, Card, Input
+
+**Smart Components (features/):**
+- ✅ Container/feature components
+- ✅ Manage state (useState, useContext, etc.)
+- ✅ Handle business logic
+- ✅ Connect to APIs/services
+- ✅ Compose dumb components
+- ✅ Examples: Home, FormBuilder, UserProfile, Dashboard
+
+**Examples:**
+
+```typescript
+// ✅ CORRECT - Dumb components (presentational)
+components/Field/index.tsx           // Pure Field component (props only)
+components/Field/styles.ts           // All styled() MUI components
+components/Section/index.tsx         // Pure Section component (props only)
+components/Section/styles.ts         // All styled() MUI components
+components/Button/index.tsx          // Pure Button component
+
+// ✅ CORRECT - Smart components (features)
+features/Home/index.tsx              // Home feature with state & logic
+features/Home/styles.ts              // Styled components for Home
+features/FormBuilder/index.tsx       // FormBuilder with state management
+features/FormBuilder/styles.ts       // Styled components
+features/FormBuilder/FieldList.tsx   // Feature-specific sub-component
+features/FormBuilder/SectionList.tsx // Feature-specific sub-component
+
+// ❌ WRONG - State management in components/
+components/Field/index.tsx
+// Contains useState, useEffect, business logic (should be in features/)
+
+// ❌ WRONG - Pure presentation in features/
+features/Button/index.tsx
+// Just renders a styled button with no logic (should be in components/)
+
+// ❌ WRONG - Styled components mixed in index.tsx
+components/Field/index.tsx
+// Contains both component logic AND styled() calls (should be separated)
+
+// ❌ WRONG - lowercase names
+components/field/index.tsx
+features/form-builder/index.tsx
+```
+
+**Rules:**
+1. **Component folders** use PascalCase (e.g., `Field`, `Section`, `FormBuilder`)
+2. **Dumb components** go in `components/` - presentational only, no state/logic
+3. **Smart components** go in `features/` - state management, business logic
+4. **Styled components** MUST be in separate `styles.ts` file - NEVER mix styled() calls with component logic
+5. **Main component** always in `index.tsx` of the component/feature folder
+6. **Sub-components** live in the same folder (features only)
+7. **Export pattern**: Can have a file named after component that re-exports: `export * from './ComponentName'`
+
+### Styled Components File Pattern
+
+**CRITICAL: All styled() calls must be in a separate styles.ts file**
+
+```typescript
+// ❌ WRONG - index.tsx with styled() calls mixed in
+// components/FormBuilder/Field/index.tsx
+import { styled } from '@mui/material/styles';
+
+const FieldContainer = styled(Box)(({ theme }) => ({...}));
+const DragHandle = styled(IconButton)(({ theme }) => ({...}));
+
+export const Field = () => {
+  return <FieldContainer>...</FieldContainer>
+}
+
+// ✅ CORRECT - Separate styles.ts file
+// components/FormBuilder/Field/styles.ts
+import { styled } from '@mui/material/styles';
+import { Box, IconButton } from '@mui/material';
+
+export const FieldContainer = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isDragging',
+})<{ isDragging: boolean }>(({ theme, isDragging }) => ({
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.shape.borderRadius,
+  // ... all styles
+}));
+
+export const DragHandle = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== 'isVisible',
+})<{ isVisible: boolean }>(({ theme, isVisible }) => ({
+  opacity: isVisible ? 1 : 0,
+  // ... all styles
+}));
+
+// components/FormBuilder/Field/index.tsx
+import { FieldContainer, DragHandle } from './styles';
+
+export const Field = () => {
+  return <FieldContainer>...</FieldContainer>
+}
+```
+
+**Benefits:**
+- Clean separation of concerns (styling vs logic)
+- Easier to maintain and update styles
+- Better code organization and readability
+- Styles can be imported and reused across sub-components
+
 ## Component Design Checklist
 
 When creating any component, verify:
 
+- [ ] **Follows component structure convention** (PascalCase, index.tsx for integration)
+- [ ] **Styled components in separate styles.ts** (NEVER mix styled() with component logic)
 - [ ] Uses `styled()` or theme overrides (NOT sx prop for styling)
 - [ ] Uses theme colors (`theme.palette.*`)
 - [ ] Uses theme spacing (`theme.spacing()`)
