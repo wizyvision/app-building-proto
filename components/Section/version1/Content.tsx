@@ -3,7 +3,8 @@
 import React from 'react';
 import { Collapse } from '@mui/material';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { Field, FieldProps } from '@/components/Field/Field';
+import { Field } from '@/components/Field';
+import { SectionContentProps } from './types';
 import {
   ContentContainer,
   ContentInner,
@@ -13,15 +14,12 @@ import {
   EmptyState,
 } from './styles';
 
-export interface SectionContentProps {
-  isExpanded: boolean;
-  fields: Omit<FieldProps, 'onEditLabel' | 'onEdit' | 'onMenuOpen'>[];
-  onFieldEditLabel: (fieldId: string, newLabel: string) => void;
-  onFieldEdit: (fieldId: string) => void;
-  onFieldMenuOpen: (fieldId: string, event: React.MouseEvent<HTMLButtonElement>) => void;
-  onAddField: () => void;
-}
-
+/**
+ * SectionContent - Expandable content area for Section component
+ *
+ * Contains fields list and "Add Field" button.
+ * See Section component for full UX principles documentation.
+ */
 export const SectionContent: React.FC<SectionContentProps> = ({
   isExpanded,
   fields,
@@ -59,11 +57,12 @@ export const SectionContent: React.FC<SectionContentProps> = ({
             </SortableContext>
           )}
 
-          {/* Add Field Button - Fitts's Law: Full width for easy targeting */}
+          {/* Add Field Button - Fitts's Law: Centered for easy targeting */}
           <AddFieldButton
             variant="outlined"
             startIcon={<AddFieldIcon />}
             onClick={onAddField}
+            aria-label="Add new field to section"
           >
             Add Field
           </AddFieldButton>

@@ -3,15 +3,17 @@
 import React, { useState } from 'react';
 import { DndContext, DragEndEvent, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
-import { Section } from '@/components/Section/Section';
-import { SectionContent } from '@/components/Section/Section/SectionContent';
-import { FieldProps } from '@/components/Field/Field';
+import { Section as SectionComponent } from '@/components/Section';
+import { SectionContent } from '@/components/Section/version1/Content';
+import { FieldProps } from '@/components/Field';
+import { VersionTabs } from '@/components/shared/VersionTabs';
+import { VersionInfo } from '@/components/shared/VersionInfo';
 import {
   StorySection,
   ShowcaseGrid,
   StoryTitle,
   StoryDescription,
-} from './styles';
+} from '../styles';
 
 interface MockField extends Omit<FieldProps, 'onEditLabel' | 'onEdit' | 'onMenuOpen'> {
   id: string;
@@ -27,7 +29,24 @@ interface MockSection {
   fields: MockField[];
 }
 
-export const SectionShowcase: React.FC = () => {
+const SECTION_VERSIONS = [
+  {
+    version: 1,
+    date: 'October 2, 2025',
+    description: 'Initial implementation with collapsible sections and field management',
+    features: [
+      'Collapsible header with expand/collapse',
+      'Drag-and-drop section reordering',
+      'Inline editing of section names',
+      'Delete functionality for non-system sections',
+      'Add field button with empty state',
+      'Progressive disclosure (hover shows actions)',
+    ],
+  },
+];
+
+export const Section: React.FC = () => {
+  const [currentVersion, setCurrentVersion] = useState(1);
   const [sections, setSections] = useState<MockSection[]>([
     {
       id: 'section-1',
@@ -141,22 +160,32 @@ export const SectionShowcase: React.FC = () => {
     });
   };
 
+  const versionData = SECTION_VERSIONS.find((v) => v.version === currentVersion);
+
   return (
     <StorySection elevation={0}>
-      <StoryTitle variant="h5">
-        Section Component
-      </StoryTitle>
+      <StoryTitle variant="h5">Section Component</StoryTitle>
       <StoryDescription variant="body2">
-        • Click section name to edit inline
-        <br />
-        • Hover to reveal drag handles and action buttons
-        <br />
-        • Drag sections to reorder
-        <br />
-        • Expand/collapse sections
-        <br />• Add new fields with the "Add Field" button
+        Collapsible container for grouping form fields with drag-and-drop support
       </StoryDescription>
 
+      <VersionTabs
+        versions={SECTION_VERSIONS.map((v) => v.version)}
+        currentVersion={currentVersion}
+        latestVersion={Math.max(...SECTION_VERSIONS.map((v) => v.version))}
+        onChange={setCurrentVersion}
+      />
+
+      {versionData && (
+        <VersionInfo
+          version={versionData.version}
+          date={versionData.date}
+          description={versionData.description}
+          features={versionData.features}
+        />
+      )}
+
+      {/* Interactive Demo */}
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext
           items={sections.map((s) => s.id)}
@@ -164,7 +193,7 @@ export const SectionShowcase: React.FC = () => {
         >
           <ShowcaseGrid>
             {sections.map((section) => (
-              <Section
+              <SectionComponent
                 key={section.id}
                 id={section.id}
                 name={section.name}
@@ -187,7 +216,7 @@ export const SectionShowcase: React.FC = () => {
                   }
                   onAddField={() => handleAddField(section.id)}
                 />
-              </Section>
+              </SectionComponent>
             ))}
           </ShowcaseGrid>
         </SortableContext>

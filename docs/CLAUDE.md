@@ -1,636 +1,998 @@
-# WizyVision Form Builder Prototype - Technical Setup
+# WizyVision Form Builder Prototype - Development Guidelines
 
-## Project Overview
-Build a prototype for WizyVision's form builder redesign focusing on device-based layouts (mobile/tablet/desktop). This prototype will be used for stakeholder feedback throughout Q4 2025.
+> **CRITICAL**: This document defines STRICT rules for building the WizyVision Form Builder prototype. Claude MUST follow every rule without exception.
 
-## Tech Stack Requirements
+---
 
-### Core Framework
-- **Next.js 14** (App Router)
-- **React 18**
-- **TypeScript**
+## 📋 PROTOTYPE STRUCTURE (MANDATORY)
 
-### UI & Styling
-- **Material UI v5** (components, icons, styles)
-  - Use `@mui/material` for components
-  - Use `@mui/icons-material` for icons
-  - Use MUI's styling solution (`styled`, `sx` prop)
-  - Theme: Use the configured WizyVision MUI theme
+### Route Hierarchy
 
-### Form Management
-- **React Hook Form v7**
-  - Use for all form state management
-  - Validation with built-in validators
-  - Performance optimization with controlled/uncontrolled inputs
-
-### Data Fetching & State
-- **React Query v5** (TanStack Query)
-  - Mock API calls for prototype
-  - Cache management
-  - Optimistic updates
-
-### Drag & Drop
-- **dnd-kit**
-  - Use `@dnd-kit/core` for drag and drop functionality
-  - Use `@dnd-kit/sortable` for reorderable lists
-  - Use `@dnd-kit/utilities` for helper functions
-
-## Design System & Theme
-
-### CRITICAL: Use Existing Theme Only
-
-**All components MUST use the configured WizyVision theme from `/theme/muiTheme.ts`**
-
-**DO NOT:**
-- Create new color values
-- Define custom spacing outside theme
-- Add arbitrary styles
-- Use hardcoded colors or dimensions
-
-**DO:**
-- Use `theme.palette.primary.main` for colors
-- Use `theme.spacing(2)` for spacing
-- Use MUI components styled via theme
-- Reference design tokens from `designTokens.ts`
-
-**If a component doesn't align with the theme:**
-- Modify the component to use theme values
-- Extend the theme if absolutely necessary
-- Document why theme extension was needed
-
-### Design Principles to Apply
-
-When designing any component, apply these UX principles:
-
-**Jakob's Law:**
-- Users expect patterns similar to other products they know
-- Use familiar UI patterns (tabs, dropdowns, drag handles)
-- Don't reinvent standard interactions
-
-**Fitts's Law:**
-- Important actions should be easy to reach
-- Touch targets minimum 44x44px on mobile
-- Primary buttons larger and more accessible than secondary
-
-**Hick's Law:**
-- Reduce choices to minimize decision time
-- Limit options: 3-5 primary actions per screen
-- Use progressive disclosure for advanced options
-
-**Miller's Law:**
-- Group related items in chunks of 5-7
-- Don't overwhelm with too many fields at once
-- Use sections to organize information
-
-**Visual Hierarchy:**
-- Most important actions: Primary button style
-- Secondary actions: Outlined button style
-- Tertiary actions: Text button style
-
-**Consistency:**
-- Use same patterns throughout
-- Reuse components where possible
-- Maintain spacing consistency
-
-### WizyVision MUI Theme Configuration
-
-**Theme Architecture:**
-- **Design Tokens:** `/theme/designTokens.ts` - Single source of truth for all design values
-- **Theme Config:** `/theme/muiTheme.ts` - MUI theme using design tokens
-- **Component Overrides:** `/theme/overrides/` - Individual component style overrides
-- **Theme Registry:** `/theme/ThemeRegistry.tsx` - Theme provider wrapper
-
-**Colors (from Figma - WizyVision Design System):**
-
-**Primary (Red):**
-```typescript
-primary: {
-  1: '#fde9e8',    2: '#f9c2be',    3: '#f49b94',
-  4: '#f0736a',    5: '#eb4236',    6: '#e82517',
-  7: '#be1e13',    8: '#be1e13',    9: '#95180f',    10: '#6b110b',
-  main: '#eb4236',      // WizyVision red (5)
-  light: '#f0736a',     // (4)
-  dark: '#be1e13',      // (7)
-  lighter: '#f9c2be',   // (2)
-  darker: '#95180f'     // (9)
-}
+```
+/ (Home)
+├── /prototypes (Feature List)
+│   └── /prototypes/[feature] (Feature Overview with Version Cards)
+│       └── /prototypes/[feature]/version/[id] (Wireframe/Design View)
+│
+└── /components (Component Showcase)
+    ├── Drawer Navigation (components list)
+    └── Component View (variants: empty, filled, states)
 ```
 
-**Secondary (Cyan/Teal):**
+### Page Breakdown
+
+**1. Home Page (`/`)**
+- Purpose: Navigation hub
+- Links to: "Prototypes" and "Components"
+- Clean, minimal, centered layout
+
+**2. Prototypes Landing (`/prototypes`)**
+- Purpose: List all features/prototypes
+- Display: Grid/list of feature cards
+- Navigation: Click feature → feature overview
+
+**3. Feature Overview (`/prototypes/[feature]`)**
+- Purpose: Show all versions of a feature
+- Display: Case study cards for each version
+- Content per card: Version number, description, thumbnail, date
+- Navigation: Click version card → wireframe view
+
+**4. Wireframe View (`/prototypes/[feature]/version/[id]`)**
+- Purpose: Display specific wireframe/design
+- Content: Full design with annotations
+- Back navigation to feature overview
+
+**5. Components Showcase (`/components`)**
+- Layout: Drawer (left) + Main content (right)
+- Drawer: List of all components (Section, Field, Button, etc.)
+- Main: Selected component with interactive variants
+- Variants: Empty state, filled state, hover, disabled, error, etc.
+
+---
+
+## 🎯 DESIGN PRINCIPLES (MUST APPLY)
+
+### Every Component Must Document Which Principles Apply
+
+When creating ANY component, explicitly state in code comments:
+
 ```typescript
-secondary: {
-  1: '#e8fbfd',    2: '#bef5f9',    3: '#94eef4',
-  4: '#6ae7f0',    5: '#36dfeb',    6: '#17dae8',
-  7: '#13b3be',    8: '#0f8c95',    9: '#0b646b',
-  10: '#063d41',   11: '#021617',
-  main: '#36dfeb',      // (5)
-  light: '#6ae7f0',     // (4)
-  dark: '#13b3be',      // (7)
-  lighter: '#bef5f9',   // (2)
-  darker: '#0b646b'     // (9)
-}
+/**
+ * ComponentName - [Brief description]
+ * 
+ * UX PRINCIPLES APPLIED:
+ * - Jakob's Law: [How it's applied]
+ * - Fitts's Law: [How it's applied]
+ * - Hick's Law: [How it's applied]
+ * - Miller's Law: [How it's applied]
+ * - Visual Hierarchy: [How it's applied]
+ * 
+ * INTERACTION DESIGN:
+ * - [Describe key interactions]
+ * - [Describe hover states]
+ * - [Describe click behaviors]
+ */
 ```
 
-**Text Colors (Day Scale 7-11 for body text):**
+### Principle Guidelines
+
+**Jakob's Law**: Users expect familiar patterns
+- ✅ Use standard UI conventions (tabs, cards, drawers)
+- ✅ Don't reinvent common interactions
+- ✅ Follow Material Design patterns (we're using MUI)
+
+**Fitts's Law**: Targets should be easy to reach
+- ✅ Primary buttons: min 48x48px (mobile), 44x44px (desktop)
+- ✅ Touch targets: min 44x44px spacing between interactive elements
+- ✅ Place primary actions in easy-reach zones
+
+**Hick's Law**: Reduce choice to reduce decision time
+- ✅ Limit primary actions to 3-5 per screen
+- ✅ Use progressive disclosure for advanced options
+- ✅ Group related actions
+
+**Miller's Law**: Chunk information (5-7 items)
+- ✅ Group form fields in logical sections
+- ✅ Limit navigation items to 5-7
+- ✅ Use visual grouping (cards, sections)
+
+**Visual Hierarchy**: Guide user attention
+- ✅ Primary action: Contained button (filled)
+- ✅ Secondary action: Outlined button
+- ✅ Tertiary action: Text button
+- ✅ Use typography scale (h1 → h6 → body)
+
+---
+
+## 🎨 STYLING RULES (ZERO TOLERANCE)
+
+### CRITICAL: No Arbitrary Styling
+
+**FORBIDDEN:**
 ```typescript
-text: {
-  primary: '#262626',    // Day 10 - Main text
-  secondary: '#595959',  // Day 8 - Secondary text
-  title: '#262626',      // Day 10 - Titles
-  disabled: '#bfbfbf',   // Day 6 - Disabled states
-  divider: '#f0f0f0',    // Day 4 - Dividers
-  day: {
-    7: '#8c8c8c',   8: '#595959',   9: '#434343',
-    10: '#262626',  11: '#1f1f1f'
-  }
-}
+// ❌ NEVER DO THIS
+<Box sx={{ backgroundColor: '#ff0000' }}>
+<Button sx={{ padding: '13px', margin: '7px' }}>
+<Card sx={{ borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+const styles = { color: '#333333', fontSize: '15px' }
 ```
 
-**Component-Specific Colors:**
+**REQUIRED:**
 ```typescript
-component: {
-  adminSidebar: { background: '#4e546c', iconColor: '#a7b6c4', ... },
-  appBar: { userView: '#ffffff', adminView: '#eb4236' },
-  searchBar: { fill: '#f8f8f8' },
-  table: { header: '#fafafa', highlight: '#f5f5f5', ... }
-}
-form: {
-  label: '#797979',
-  thumbnailButton: '#ededed'
-}
-```
+// ✅ ALWAYS DO THIS
+import { styled } from '@mui/material/styles';
 
-**Typography:**
-- Font: Public Sans, Helvetica, Arial
-- H1: 32px, weight 600, line-height 1.2, letter-spacing -0.01em
-- H2: 24px, weight 600, line-height 1.3, letter-spacing -0.005em
-- H3: 20px, weight 500, line-height 1.4
-- H4: 18px, weight 500, line-height 1.4
-- H5: 16px, weight 500, line-height 1.5
-- H6: 14px, weight 500, line-height 1.5
-- Body1: 16px, weight 400, line-height 1.5
-- Body2: 14px, weight 400, line-height 1.43
-- Button (medium): 14px, weight 500, letter-spacing 0.025em, uppercase
-- Caption: 12px, weight 400, letter-spacing 0.02em
-- Overline: 12px, weight 500, letter-spacing 0.1em, uppercase
-
-**Spacing:**
-- Base unit: 8px
-- Use `theme.spacing(1)` = 8px
-- Use `theme.spacing(2)` = 16px
-- Use `theme.spacing(3)` = 24px
-
-**Component Styling:**
-- Cards: 12px border radius, 24px padding
-- Buttons: 4px border radius, various padding per size
-  - Small: 1px 8px
-  - Medium: 9px 16px
-  - Large: 10px 16px
-- Touch targets: 48x48px minimum (buttons), 44x44px minimum (general)
-
-**Responsive Breakpoints:**
-```typescript
-xs: 0px      // Mobile
-sm: 600px    // Mobile landscape
-md: 900px    // Tablet
-lg: 1200px   // Desktop
-xl: 1536px   // Large desktop
-```
-
-**Grid System:**
-- Mobile: 4 columns, 16px gutter, 16px margin
-- Tablet: 8 columns, 24px gutter, 24px margin
-- Desktop: 12 columns, 24px gutter, 24px margin
-
-**Effect Styles:**
-
-**Shadows:**
-- button: `0px 2px 0px 0px rgba(0, 0, 0, 0.04)` (Figma button shadow)
-- sm: `0px 1px 2px rgba(0, 0, 0, 0.05)`
-- md: `0px 1px 3px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.24)`
-- lg: `0px 4px 6px rgba(0, 0, 0, 0.1), 0px 2px 4px rgba(0, 0, 0, 0.06)`
-- xl: `0px 10px 15px rgba(0, 0, 0, 0.1), 0px 4px 6px rgba(0, 0, 0, 0.05)`
-- 2xl: `0px 20px 25px rgba(0, 0, 0, 0.15), 0px 10px 10px rgba(0, 0, 0, 0.04)`
-
-**Custom Shadows (theme.customShadows):**
-Available for all color variants: z1, z2, primary, secondary, error, warning, info, success, grey
-Plus button-specific: primaryButton, secondaryButton, errorButton, etc.
-
-**Blur:**
-- sm: 4px, md: 8px, lg: 16px, xl: 24px
-
-**Opacity:**
-- disabled: 0.38, hover: 0.04, selected: 0.08, focus: 0.12, active: 0.12
-
-**Transitions:**
-- Duration: shortest (150ms), shorter (200ms), short (250ms), standard (300ms), complex (375ms)
-- Easing: easeInOut, easeOut, easeIn, sharp
-
-### How to Style Components
-
-**CRITICAL: Use styled() or MUI's styling system, NOT sx prop for component styling**
-
-**Access Design Tokens:**
-```typescript
-import { designTokens } from '@/theme/designTokens'
-
-// Use tokens directly for consistency
-const buttonPadding = designTokens.button.padding.medium
-const primaryColor = designTokens.colors.primary.main
-const textColor = designTokens.colors.text.day[8]
-```
-
-**Method 1: styled() Component (PREFERRED):**
-```typescript
-import { styled } from '@mui/material/styles'
-import { Card, Button, Typography, Box } from '@mui/material'
-
-const StyledCard = styled(Card)(({ theme }) => ({
-  padding: theme.spacing(3),
-  borderRadius: theme.shape.borderRadius,
-  boxShadow: theme.customShadows.md,
-  backgroundColor: theme.palette.background[3],
-}))
-
-const StyledTitle = styled(Typography)(({ theme }) => ({
-  color: theme.palette.text.title,
-  marginBottom: theme.spacing(2),
-}))
-
-const HighlightBox = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.primary[2],
-  color: theme.palette.primary[9],
+const StyledBox = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
   padding: theme.spacing(2),
   borderRadius: theme.shape.borderRadius,
-}))
+  boxShadow: theme.customShadows.md,
+}));
+```
 
-function MyComponent() {
+### Styling Hierarchy
+
+**1. styled() Components (PRIMARY METHOD)**
+- Use for ALL component styling
+- Always in separate `styles.ts` file
+- Access theme via `({ theme }) => ({})`
+
+**2. Theme Overrides (GLOBAL CHANGES)**
+- Located in `/theme/overrides/`
+- Only for global component defaults
+
+**3. sx prop (FORBIDDEN FOR PRODUCTION)**
+- Only for quick prototyping experiments
+- Must be replaced with `styled()` before commit
+
+### File Structure for Styled Components
+
+```typescript
+// components/MyComponent/styles.ts
+import { styled } from '@mui/material/styles';
+import { Card, Button, Typography } from '@mui/material';
+
+export const StyledCard = styled(Card)(({ theme }) => ({
+  padding: theme.spacing(3),
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: theme.palette.background[1],
+  boxShadow: theme.customShadows.md,
+}));
+
+export const PrimaryButton = styled(Button)(({ theme }) => ({
+  minHeight: 48, // Fitts's Law: Easy to tap
+  minWidth: 120,
+  textTransform: 'none', // Override MUI default if needed
+}));
+
+// components/MyComponent/index.tsx
+import { StyledCard, PrimaryButton } from './styles';
+
+export const MyComponent = () => {
   return (
     <StyledCard>
-      <StyledTitle variant="h5">
-        Title
-      </StyledTitle>
-
-      <HighlightBox>
-        Light primary background
-      </HighlightBox>
-
-      <Button
-        variant="contained"
-        color="primary"
-        size="medium"
-      >
-        Save
-      </Button>
+      <PrimaryButton variant="contained" color="primary">
+        Action
+      </PrimaryButton>
     </StyledCard>
-  )
+  );
+};
+```
+
+---
+
+## 🏗️ COMPONENT STRUCTURE (MANDATORY)
+# **Updated claude.md Section: Component Versioning**
+
+Add this section after `## 🏗️ COMPONENT STRUCTURE (MANDATORY)` and before `### Smart vs Dumb Component Rules`:
+
+---
+
+## 🔢 COMPONENT VERSIONING (MANDATORY)
+
+### Version Structure
+
+All components follow a strict versioning structure to track iterations:
+
+```
+components/
+├── Section/
+│   ├── version1/
+│   │   ├── Header.tsx
+│   │   ├── Content.tsx
+│   │   ├── styles.ts
+│   │   └── index.tsx       # Exports Section v1
+│   ├── version2/
+│   │   ├── Header.tsx
+│   │   ├── Content.tsx
+│   │   ├── Footer.tsx      # New in v2
+│   │   ├── styles.ts
+│   │   └── index.tsx       # Exports Section v2
+│   └── index.tsx           # Exports latest version (v2)
+│
+├── Field/
+│   ├── version1/
+│   │   ├── Label.tsx
+│   │   ├── Input.tsx
+│   │   ├── styles.ts
+│   │   └── index.tsx
+│   └── index.tsx           # Exports latest (v1)
+```
+
+### Folder Naming Rules
+
+**REQUIRED:**
+- Version folders: `version1`, `version2`, `version3` (lowercase, no spaces)
+- Component folders: `PascalCase` (e.g., `Section`, `Field`)
+- Sub-components: `PascalCase` (e.g., `Header.tsx`, `Content.tsx`)
+
+**FORBIDDEN:**
+- ❌ `v1`, `V1`, `Version1`, `section-v1`
+- ❌ Mixing versions in same folder
+
+### Version Documentation
+
+**Every version folder MUST include:**
+
+```typescript
+// components/Section/version2/index.tsx
+
+/**
+ * Section Component - Version 2
+ * 
+ * VERSION INFO:
+ * - Version: 2
+ * - Created: 2025-01-15
+ * - Changes from v1:
+ *   - Added Footer sub-component
+ *   - Split Header logic from Content
+ *   - Improved collapse animation
+ *   - Breaking: Changed onEdit to onTitleChange prop
+ * 
+ * MIGRATION FROM V1:
+ * - Rename prop: onEdit → onTitleChange
+ * - Footer is now mandatory (pass null if not needed)
+ * 
+ * UX PRINCIPLES APPLIED:
+ * - Jakob's Law: Familiar collapsible pattern
+ * - Fitts's Law: 44x44px touch targets
+ * - Progressive Disclosure: Expand/collapse content
+ * 
+ * BREAKING CHANGES:
+ * - onEdit prop renamed to onTitleChange
+ * - Footer prop is now required (can be null)
+ */
+
+export { Section } from './Section';
+export type { SectionProps } from './types';
+```
+
+### When to Create New Version
+
+Create a new version when:
+- ✅ **Breaking changes** to props interface
+- ✅ **Major structural changes** (new sub-components, different layout)
+- ✅ **Significant behavior changes** (different interactions, states)
+- ✅ **Design system updates** (new theme, different principles applied)
+
+**DO NOT** create new version for:
+- ❌ Bug fixes
+- ❌ Minor styling tweaks
+- ❌ Performance optimizations
+- ❌ Adding optional props (non-breaking)
+
+### Sub-Component Rules
+
+**Each version can have multiple sub-components:**
+
+```typescript
+// components/Section/version2/Header.tsx
+export const Header = ({ title, onToggle }: HeaderProps) => { ... };
+
+// components/Section/version2/Content.tsx
+export const Content = ({ children }: ContentProps) => { ... };
+
+// components/Section/version2/Footer.tsx
+export const Footer = ({ actions }: FooterProps) => { ... };
+
+// components/Section/version2/index.tsx
+import { Header } from './Header';
+import { Content } from './Content';
+import { Footer } from './Footer';
+
+export const Section = ({ ... }: SectionProps) => {
+  return (
+    <SectionContainer>
+      <Header {...headerProps} />
+      <Content>{children}</Content>
+      <Footer {...footerProps} />
+    </SectionContainer>
+  );
+};
+```
+
+**Sub-component structure:**
+- Each sub-component has own file
+- Sub-components are NOT exported from version folder (internal only)
+- Only main component exported from `index.tsx`
+
+### Main Export Pattern
+
+```typescript
+// components/Section/index.tsx (root level)
+
+/**
+ * Section Component - Latest Version Export
+ * 
+ * This file exports the LATEST stable version.
+ * Import older versions explicitly if needed.
+ */
+
+// Export latest version (v2)
+export { Section } from './version2';
+export type { SectionProps } from './version2/types';
+
+// For legacy support, users can import specific versions:
+// import { Section as SectionV1 } from '@/components/Section/version1';
+```
+
+### Importing Versions
+
+**Latest version (recommended):**
+```typescript
+import { Section } from '@/components/Section';
+```
+
+**Specific version (legacy support):**
+```typescript
+import { Section as SectionV1 } from '@/components/Section/version1';
+import { Section as SectionV2 } from '@/components/Section/version2';
+```
+
+**In prototypes showing evolution:**
+```typescript
+// /prototypes/form-builder/version/1/page.tsx
+import { Section as SectionV1 } from '@/components/Section/version1';
+
+// /prototypes/form-builder/version/2/page.tsx
+import { Section as SectionV2 } from '@/components/Section/version2';
+```
+
+### Version Comparison Documentation
+
+**For component showcase (`/components` route):**
+
+```typescript
+// app/components/section/page.tsx
+import { SectionV1 } from '@/components/Section/version1';
+import { SectionV2 } from '@/components/Section/version2';
+
+export default function SectionShowcase() {
+  return (
+    <ComponentShowcase
+      componentName="Section"
+      versions={[
+        {
+          version: 1,
+          component: <SectionV1 {...props} />,
+          description: "Initial version with basic collapse",
+          changes: "Initial implementation"
+        },
+        {
+          version: 2,
+          component: <SectionV2 {...props} />,
+          description: "Added footer, improved animations",
+          changes: "Split Header/Content/Footer, better UX"
+        }
+      ]}
+    />
+  );
 }
 ```
 
-**Method 2: Component Override in Theme (for global styles):**
-See `/theme/overrides/` directory for examples.
+### Version Checklist
 
-**Method 3: sx prop (USE SPARINGLY - only for one-off adjustments):**
-```typescript
-// Only use sx for quick prototyping or very specific one-off cases
-<Box sx={{ mt: 2 }}>Content</Box>  // ⚠️ Acceptable for simple margin/padding tweaks
+Before creating a new version:
+
+- [ ] **Is this a breaking change?** (If no, update current version)
+- [ ] **Does this warrant separate version?** (Major changes only)
+- [ ] **Are all changes documented?** (Version header comment)
+- [ ] **Migration notes provided?** (How to upgrade from previous)
+- [ ] **Sub-components properly structured?** (Separate files)
+- [ ] **All styling in styles.ts?** (No sx props)
+- [ ] **Design principles documented?** (Which UX laws apply)
+- [ ] **Previous version still works?** (Don't break existing prototypes)
+
+### Version Naming in Prompts
+
+When requesting component creation, specify version:
+
+```
+"Create Section component (version 2) with the following changes..."
+"Update Field component - create version 3 with..."
 ```
 
-**DO NOT use sx for:**
-- Complex styling
-- Reusable components
-- Multiple style properties
-- Production code
+### Current Component Versions (Registry)
 
-**USE styled() instead for:**
-- All component styling
-- Reusable styled components
-- Complex styling logic
-- Production-ready code
+Maintain this list as components are created:
 
-**Available Color Shades via Theme:**
+| Component | Latest Version | Created | Changes |
+|-----------|----------------|---------|---------|
+| Field | version 1 | 2025-01-15 | Initial: Drag handle, inline edit, icons |
+| Section | version 2 | 2025-01-15 | v2: Split Header/Content/Footer |
+| AppBar | version 1 | 2025-01-15 | Initial: Basic navigation bar |
+| FieldDrawer | version 1 | 2025-01-15 | Initial: Left sidebar for field library |
+| DraggableButton | version 1 | 2025-01-15 | Initial: Colored dot buttons |
+| FieldConfigDrawer | version 1 | 2025-01-15 | Initial: Right drawer for config |
+
+
+### Smart vs Dumb Component Rules
+
+```
+components/                    # DUMB (Presentational Only)
+├── Section/
+│   ├── index.tsx             # Pure component (props in, UI out)
+│   ├── styles.ts             # ALL styled() calls here
+│   └── types.ts              # TypeScript interfaces
+│
+features/                      # SMART (State + Logic)
+├── FormBuilder/
+│   ├── index.tsx             # Feature integration
+│   ├── styles.ts             # ALL styled() calls here
+│   ├── SectionList.tsx       # Sub-component with logic
+│   ├── FieldList.tsx         # Sub-component with logic
+│   └── types.ts              # TypeScript interfaces
+```
+
+### Component Creation Checklist
+
+Before creating ANY component, verify:
+
+- [ ] **Is this presentational or stateful?**
+  - Presentational → `components/`
+  - Stateful → `features/`
+- [ ] **Folder named in PascalCase** (e.g., `Section`, `FormBuilder`)
+- [ ] **Main component in `index.tsx`**
+- [ ] **ALL styled() calls in `styles.ts`** (ZERO in index.tsx)
+- [ ] **Props defined in `types.ts`** (if complex)
+- [ ] **Design principles documented in comments**
+- [ ] **Interactions are functional** (not placeholder)
+
+### Example Structure
+
 ```typescript
-// Primary shades (1-10)
-theme.palette.primary[1]  // '#fde9e8' - Lightest
-theme.palette.primary[5]  // '#eb4236' - Main (same as .main)
-theme.palette.primary[10] // '#6b110b' - Darkest
+// components/Section/types.ts
+export interface SectionProps {
+  id: string;
+  title: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onEdit: (newTitle: string) => void;
+  onAddField: () => void;
+  children?: React.ReactNode;
+}
 
-// Secondary shades (1-11)
+// components/Section/styles.ts
+import { styled } from '@mui/material/styles';
+import { Card, IconButton, Typography } from '@mui/material';
+
+export const SectionContainer = styled(Card)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: theme.palette.background[1],
+  boxShadow: theme.customShadows.md,
+  // Jakob's Law: Familiar card-based layout
+}));
+
+export const SectionHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(2),
+  cursor: 'pointer',
+  // Fitts's Law: Full header is clickable (larger target)
+}));
+
+export const ExpandButton = styled(IconButton)(({ theme }) => ({
+  marginRight: theme.spacing(1),
+  // Fitts's Law: 44x44px minimum touch target
+}));
+
+// components/Section/index.tsx
+import { useState } from 'react';
+import { SectionContainer, SectionHeader, ExpandButton } from './styles';
+import { SectionProps } from './types';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
+/**
+ * Section Component
+ * 
+ * UX PRINCIPLES APPLIED:
+ * - Jakob's Law: Familiar collapsible card pattern (like Accordion)
+ * - Fitts's Law: Full header clickable, 44x44px icon buttons
+ * - Visual Hierarchy: Clear title, subtle action buttons
+ * - Progressive Disclosure: Expand/collapse to manage cognitive load
+ * 
+ * INTERACTIONS:
+ * - Click header: Toggle expand/collapse
+ * - Click title: Inline edit mode
+ * - Hover header: Show action buttons
+ * - Click "Add Field": Trigger onAddField callback
+ */
+export const Section = ({ 
+  id, 
+  title, 
+  isExpanded, 
+  onToggle, 
+  onEdit,
+  onAddField,
+  children 
+}: SectionProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+
+  return (
+    <SectionContainer>
+      <SectionHeader onClick={onToggle}>
+        <ExpandButton size="small">
+          <ExpandMoreIcon 
+            sx={{ 
+              transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.2s'
+            }} 
+          />
+        </ExpandButton>
+        {/* Title, edit mode, action buttons, etc. */}
+      </SectionHeader>
+      
+      {isExpanded && (
+        <div>
+          {children}
+          {/* Add Field button */}
+        </div>
+      )}
+    </SectionContainer>
+  );
+};
+```
+
+---
+
+## 🎨 THEME USAGE (STRICT REFERENCE)
+
+### Color Palette
+
+**Primary (WizyVision Red)**
+```typescript
+theme.palette.primary[1]   // '#fde9e8' - Lightest
+theme.palette.primary[5]   // '#eb4236' - Main (brand color)
+theme.palette.primary[10]  // '#6b110b' - Darkest
+theme.palette.primary.main // Same as [5]
+theme.palette.primary.light // Same as [4]
+theme.palette.primary.dark // Same as [7]
+```
+
+**Secondary (Cyan/Teal)**
+```typescript
 theme.palette.secondary[1]  // '#e8fbfd' - Lightest
 theme.palette.secondary[5]  // '#36dfeb' - Main
 theme.palette.secondary[11] // '#021617' - Darkest
+```
 
-// Background shades (1-5)
+**Background (Grays)**
+```typescript
 theme.palette.background[1] // '#ffffff' - White
 theme.palette.background[2] // '#fafafa' - Lightest gray
 theme.palette.background[3] // '#f5f5f5' - Very light gray
 theme.palette.background[4] // '#f0f0f0' - Light gray
 theme.palette.background[5] // '#ededed' - Subtle gray
-
-// Semantic shortcuts
-theme.palette.primary.lighter   // Same as [2]
-theme.palette.primary.light     // Same as [4]
-theme.palette.primary.main      // Same as [5]
-theme.palette.primary.dark      // Same as [7]
-theme.palette.primary.darker    // Same as [9]
 ```
 
-**Override Components Properly:**
-Create file in `/theme/overrides/ComponentName.ts`:
+**Text Colors**
 ```typescript
-import { Theme } from '@mui/material/styles'
-import { designTokens } from '../designTokens'
-
-export default function ComponentName(theme: Theme) {
-  return {
-    MuiComponentName: {
-      styleOverrides: {
-        root: {
-          borderRadius: designTokens.borderRadius.button,
-          // Use designTokens, not arbitrary values
-        }
-      }
-    }
-  }
-}
+theme.palette.text.primary    // '#262626' - Main text
+theme.palette.text.secondary  // '#595959' - Secondary text
+theme.palette.text.disabled   // '#bfbfbf' - Disabled
 ```
 
-**Incorrect vs Correct Usage:**
+### Spacing
 
 ```typescript
-// ❌ WRONG - Hardcoded colors with sx
-<Button sx={{ backgroundColor: '#ff0000' }}>Save</Button>
-<Box sx={{ backgroundColor: '#ffffff' }}>Content</Box>
-
-// ❌ WRONG - Using sx for complex styling
-<Card sx={{
-  padding: '24px',
-  backgroundColor: '#fafafa',
-  borderRadius: '8px'
-}}>Content</Card>
-
-// ✅ CORRECT - Use styled() with theme
-const StyledButton = styled(Button)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-}))
-
-const StyledBox = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.background[1],
-  padding: theme.spacing(3),
-  borderRadius: theme.shape.borderRadius,
-}))
-
-// ❌ WRONG - Arbitrary values
-<Card sx={{ padding: '13px', borderRadius: '5px' }}>Content</Card>
-
-// ✅ CORRECT - Theme values with styled()
-const StyledCard = styled(Card)(({ theme }) => ({
-  padding: theme.spacing(2),
-  borderRadius: theme.shape.borderRadius,
-}))
+theme.spacing(1)  // 8px
+theme.spacing(2)  // 16px
+theme.spacing(3)  // 24px
+theme.spacing(4)  // 32px
+// Use only theme.spacing(), NEVER hardcoded px values
 ```
 
-## Lo-Fi Design Generation
+### Typography
 
-**When the user provides "lo-fi" or requests a design concept:**
-
-1. **Start with a Component** - Always create a functional React component first
-2. **Apply Design Principles** - Explicitly apply relevant UX laws:
-   - **Jakob's Law**: Use familiar patterns users recognize
-   - **Fitts's Law**: Make important actions easy to reach (proper touch targets)
-   - **Hick's Law**: Limit choices to 3-5 primary actions
-   - **Miller's Law**: Group items in chunks of 5-7
-   - **Visual Hierarchy**: Primary → Outlined → Text button styles
-3. **Use Theme Styling** - Apply WizyVision theme via styled() components
-4. **Make it Responsive** - Consider mobile/tablet/desktop breakpoints
-5. **Document Design Decisions** - Comment why each principle was applied
-
-**Lo-Fi Example:**
 ```typescript
-import { styled } from '@mui/material/styles'
-import { Card, Button, Typography, Stack } from '@mui/material'
+theme.typography.h1  // 32px, weight 600
+theme.typography.h2  // 24px, weight 600
+theme.typography.h5  // 16px, weight 500
+theme.typography.body1  // 16px, weight 400
+theme.typography.body2  // 14px, weight 400
+theme.typography.button // 14px, weight 500, uppercase
+```
 
-// Jakob's Law: Familiar card-based layout
-// Fitts's Law: Large button (48px) for primary action
-const ActionCard = styled(Card)(({ theme }) => ({
-  padding: theme.spacing(3),
-  maxWidth: 400,
-  // Visual Hierarchy: Card elevation distinguishes importance
-  boxShadow: theme.customShadows.md,
-}))
+### Shadows
 
-// Hick's Law: Limited to 2 actions (primary + secondary)
-const ActionButton = styled(Button)(({ theme }) => ({
-  minHeight: 48, // Fitts's Law: Easy to tap
-}))
+```typescript
+theme.customShadows.button  // Button shadow
+theme.customShadows.sm      // Small elevation
+theme.customShadows.md      // Medium elevation (cards)
+theme.customShadows.lg      // Large elevation (modals)
+```
 
-function FormSubmitCard() {
+### Border Radius
+
+```typescript
+theme.shape.borderRadius  // 4px (buttons)
+12                        // 12px (cards) - use directly
+```
+
+---
+
+## ⚙️ INTERACTIVITY (REQUIRED)
+
+### Every Interactive Component Must Have:
+
+1. **Hover States**
+   ```typescript
+   '&:hover': {
+     backgroundColor: theme.palette.action.hover,
+   }
+   ```
+
+2. **Active/Focus States**
+   ```typescript
+   '&:active': {
+     backgroundColor: theme.palette.action.selected,
+   },
+   '&:focus-visible': {
+     outline: `2px solid ${theme.palette.primary.main}`,
+   }
+   ```
+
+3. **Disabled States**
+   ```typescript
+   '&:disabled': {
+     opacity: theme.palette.action.disabledOpacity,
+     cursor: 'not-allowed',
+   }
+   ```
+
+4. **Loading States** (if applicable)
+   ```typescript
+   {isLoading && <CircularProgress size={20} />}
+   ```
+
+5. **Transitions** (smooth animations)
+   ```typescript
+   transition: theme.transitions.create(['background-color', 'transform'], {
+     duration: theme.transitions.duration.short,
+   })
+   ```
+
+### Interaction Checklist
+
+- [ ] Hover changes visual state (background, border, shadow)
+- [ ] Click provides feedback (ripple effect, state change)
+- [ ] Focus is visible (outline, border)
+- [ ] Disabled state is clear (opacity, cursor)
+- [ ] Transitions are smooth (200-300ms)
+- [ ] Keyboard navigation works (Tab, Enter, Escape)
+
+---
+
+## 📱 RESPONSIVE DESIGN (REQUIRED)
+
+### Breakpoints
+
+```typescript
+theme.breakpoints.up('xs')  // 0px - Mobile
+theme.breakpoints.up('sm')  // 600px - Mobile landscape
+theme.breakpoints.up('md')  // 900px - Tablet
+theme.breakpoints.up('lg')  // 1200px - Desktop
+theme.breakpoints.up('xl')  // 1536px - Large desktop
+```
+
+### Mobile-First Approach
+
+```typescript
+const ResponsiveCard = styled(Card)(({ theme }) => ({
+  padding: theme.spacing(2), // Mobile default
+  
+  [theme.breakpoints.up('md')]: {
+    padding: theme.spacing(3), // Tablet+
+  },
+  
+  [theme.breakpoints.up('lg')]: {
+    padding: theme.spacing(4), // Desktop+
+  },
+}));
+```
+
+### Touch Targets (Mobile)
+
+- Minimum 44x44px for all interactive elements
+- Use `minHeight: 44` and `minWidth: 44` in styled components
+- Increase spacing between touch targets on mobile
+
+---
+
+## 🚫 COMMON MISTAKES (NEVER DO THIS)
+
+### 1. Mixing Styled Components with sx Prop
+```typescript
+// ❌ WRONG
+const StyledCard = styled(Card)(({ theme }) => ({ ... }));
+<StyledCard sx={{ margin: 2 }} /> // Don't mix!
+
+// ✅ CORRECT
+const StyledCard = styled(Card)(({ theme }) => ({ 
+  margin: theme.spacing(2),
+}));
+<StyledCard />
+```
+
+### 2. Hardcoded Values
+```typescript
+// ❌ WRONG
+padding: '15px'
+color: '#eb4236'
+fontSize: '14px'
+
+// ✅ CORRECT
+padding: theme.spacing(2)
+color: theme.palette.primary.main
+fontSize: theme.typography.body2.fontSize
+```
+
+### 3. Non-Interactive "Interactive" Components
+```typescript
+// ❌ WRONG - No hover state
+const Button = styled('button')({ ... });
+
+// ✅ CORRECT - Full interactivity
+const Button = styled('button')(({ theme }) => ({
+  '&:hover': { backgroundColor: theme.palette.action.hover },
+  '&:active': { backgroundColor: theme.palette.action.selected },
+  '&:disabled': { opacity: 0.38 },
+  transition: theme.transitions.create('background-color'),
+}));
+```
+
+### 4. Missing Design Principle Documentation
+```typescript
+// ❌ WRONG - No documentation
+export const MyComponent = () => { ... }
+
+// ✅ CORRECT - Documented
+/**
+ * MyComponent
+ * 
+ * UX PRINCIPLES APPLIED:
+ * - Jakob's Law: [explanation]
+ * - Fitts's Law: [explanation]
+ */
+export const MyComponent = () => { ... }
+```
+
+### 5. Component in Wrong Directory
+```typescript
+// ❌ WRONG
+components/FormBuilder/index.tsx  // Has useState, useEffect
+features/Button/index.tsx         // Just renders a button
+
+// ✅ CORRECT
+features/FormBuilder/index.tsx    // Stateful feature
+components/Button/index.tsx       // Presentational component
+```
+
+---
+
+## ✅ CODE REVIEW CHECKLIST
+
+Before committing ANY code, verify:
+
+### Structure
+- [ ] Component in correct directory (`components/` vs `features/`)
+- [ ] Folder named in PascalCase
+- [ ] Main component in `index.tsx`
+- [ ] Styled components in `styles.ts`
+- [ ] Types in `types.ts` (if needed)
+
+### Styling
+- [ ] ZERO sx prop usage (except quick prototypes)
+- [ ] ALL styling uses `styled()`
+- [ ] ALL colors from `theme.palette.*`
+- [ ] ALL spacing from `theme.spacing()`
+- [ ] ALL typography from `theme.typography.*`
+- [ ] No hardcoded values anywhere
+
+### Design Principles
+- [ ] Design principles documented in comments
+- [ ] At least 2 UX laws explicitly applied
+- [ ] Touch targets 44x44px minimum
+- [ ] Visual hierarchy clear (primary/secondary/tertiary)
+- [ ] Limited choices (3-5 primary actions)
+
+### Interactivity
+- [ ] Hover states defined
+- [ ] Active/focus states defined
+- [ ] Disabled states (if applicable)
+- [ ] Smooth transitions
+- [ ] Keyboard navigation works
+
+### Responsive
+- [ ] Mobile-first breakpoints
+- [ ] Touch targets sized correctly
+- [ ] Layout adapts to screen size
+
+### Accessibility
+- [ ] ARIA labels where needed
+- [ ] Keyboard navigation
+- [ ] Focus indicators visible
+- [ ] Color contrast meets WCAG AA
+
+---
+
+## 🎯 PROTOTYPE-SPECIFIC RULES
+
+### Component Showcase Page Requirements
+
+When building `/components` route:
+
+1. **Drawer Navigation**
+   - List all components alphabetically
+   - Highlight active component
+   - Sticky/fixed position
+
+2. **Component Display**
+   - Component name as h1
+   - Short description
+   - Interactive demo at top
+   - Props table below
+   - Variants section (empty, filled, error, disabled, etc.)
+
+3. **Variant Display**
+   - Each variant in separate card
+   - Label for each variant
+   - Code snippet (optional)
+
+### Example Component Showcase Structure
+
+```typescript
+// app/components/[componentName]/page.tsx
+import { ComponentDemo } from '@/features/ComponentShowcase';
+import { Section } from '@/components/Section';
+
+export default function SectionShowcase() {
   return (
-    <ActionCard>
-      {/* Visual Hierarchy: Title is prominent */}
-      <Typography variant="h5" gutterBottom>
-        Save Your Changes?
-      </Typography>
-
-      {/* Miller's Law: Simple 2-item choice */}
-      <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-        <ActionButton variant="contained" color="primary" fullWidth>
-          Save
-        </ActionButton>
-        <ActionButton variant="outlined" fullWidth>
-          Cancel
-        </ActionButton>
-      </Stack>
-    </ActionCard>
-  )
+    <ComponentDemo
+      componentName="Section"
+      description="Collapsible container for grouping form fields"
+      principles={[
+        "Jakob's Law: Familiar accordion pattern",
+        "Fitts's Law: Full header clickable",
+        "Progressive Disclosure: Expand/collapse"
+      ]}
+      variants={[
+        {
+          name: "Default (Collapsed)",
+          component: <Section title="System Information" isExpanded={false} />
+        },
+        {
+          name: "Expanded",
+          component: <Section title="System Information" isExpanded={true} />
+        },
+        {
+          name: "With Fields",
+          component: <Section title="System Information" isExpanded={true}>
+            {/* Fields */}
+          </Section>
+        }
+      ]}
+    />
+  );
 }
 ```
 
-## Component Structure Convention
+---
 
-**CRITICAL: Separate smart components (features) from dumb components (components):**
+## 📦 TECH STACK (REFERENCE)
 
-### Directory Structure
+- **Framework**: Next.js 14 (App Router)
+- **UI Library**: Material UI v5
+- **Form Management**: React Hook Form v7
+- **Drag & Drop**: dnd-kit
+- **State Management**: React Query v5
+- **Styling**: MUI styled() + theme
 
-```
-components/                   # DUMB COMPONENTS (presentational only)
-  ├── {ComponentName}/        # Component folder in PascalCase
-  │   ├── index.tsx          # Main component (props in, UI out)
-  │   ├── styles.ts          # Styled components (all styled() calls)
-  │   └── types.ts           # Optional: component-specific types
-
-features/                     # SMART COMPONENTS (business logic + state)
-  ├── {FeatureName}/         # Feature name in PascalCase (e.g., Home, FormBuilder)
-  │   ├── index.tsx          # Main feature integration/export
-  │   ├── styles.ts          # Styled components (all styled() calls)
-  │   ├── SubComponent1.tsx  # Feature-specific sub-components
-  │   ├── SubComponent2.tsx
-  │   └── types.ts           # Optional: feature-specific types
-```
-
-### Smart vs Dumb Components
-
-**Dumb Components (components/):**
-- ✅ Pure presentational components
-- ✅ Receive data via props only
-- ✅ No state management (except UI state like hover, focus)
-- ✅ No business logic
-- ✅ Reusable across features
-- ✅ Examples: Button, Field, Section, Card, Input
-
-**Smart Components (features/):**
-- ✅ Container/feature components
-- ✅ Manage state (useState, useContext, etc.)
-- ✅ Handle business logic
-- ✅ Connect to APIs/services
-- ✅ Compose dumb components
-- ✅ Examples: Home, FormBuilder, UserProfile, Dashboard
-
-**Examples:**
+### Import Patterns
 
 ```typescript
-// ✅ CORRECT - Dumb components (presentational)
-components/Field/index.tsx           // Pure Field component (props only)
-components/Field/styles.ts           // All styled() MUI components
-components/Section/index.tsx         // Pure Section component (props only)
-components/Section/styles.ts         // All styled() MUI components
-components/Button/index.tsx          // Pure Button component
+// MUI Components
+import { Box, Card, Button, Typography, Stack } from '@mui/material';
 
-// ✅ CORRECT - Smart components (features)
-features/Home/index.tsx              // Home feature with state & logic
-features/Home/styles.ts              // Styled components for Home
-features/FormBuilder/index.tsx       // FormBuilder with state management
-features/FormBuilder/styles.ts       // Styled components
-features/FormBuilder/FieldList.tsx   // Feature-specific sub-component
-features/FormBuilder/SectionList.tsx // Feature-specific sub-component
+// MUI Icons
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
 
-// ❌ WRONG - State management in components/
-components/Field/index.tsx
-// Contains useState, useEffect, business logic (should be in features/)
+// MUI Styling
+import { styled } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 
-// ❌ WRONG - Pure presentation in features/
-features/Button/index.tsx
-// Just renders a styled button with no logic (should be in components/)
-
-// ❌ WRONG - Styled components mixed in index.tsx
-components/Field/index.tsx
-// Contains both component logic AND styled() calls (should be separated)
-
-// ❌ WRONG - lowercase names
-components/field/index.tsx
-features/form-builder/index.tsx
+// Theme
+import { designTokens } from '@/theme/designTokens';
 ```
 
-**Rules:**
-1. **Component folders** use PascalCase (e.g., `Field`, `Section`, `FormBuilder`)
-2. **Dumb components** go in `components/` - presentational only, no state/logic
-3. **Smart components** go in `features/` - state management, business logic
-4. **Styled components** MUST be in separate `styles.ts` file - NEVER mix styled() calls with component logic
-5. **Main component** always in `index.tsx` of the component/feature folder
-6. **Sub-components** live in the same folder (features only)
-7. **Export pattern**: Can have a file named after component that re-exports: `export * from './ComponentName'`
+---
 
-### Styled Components File Pattern
+## 🚀 DEVELOPMENT WORKFLOW
 
-**CRITICAL: All styled() calls must be in a separate styles.ts file**
+1. **Understand the requirement**
+   - What page/component am I building?
+   - Is it smart (features) or dumb (components)?
+   - What UX principles apply?
 
-```typescript
-// ❌ WRONG - index.tsx with styled() calls mixed in
-// components/FormBuilder/Field/index.tsx
-import { styled } from '@mui/material/styles';
+2. **Create the structure**
+   - Create folder in correct directory
+   - Create `index.tsx`, `styles.ts`, `types.ts`
 
-const FieldContainer = styled(Box)(({ theme }) => ({...}));
-const DragHandle = styled(IconButton)(({ theme }) => ({...}));
+3. **Define types first** (types.ts)
+   - Props interface
+   - State types
+   - Event handlers
 
-export const Field = () => {
-  return <FieldContainer>...</FieldContainer>
-}
+4. **Create styled components** (styles.ts)
+   - Use theme values only
+   - Apply responsive breakpoints
+   - Add hover/active/focus states
 
-// ✅ CORRECT - Separate styles.ts file
-// components/FormBuilder/Field/styles.ts
-import { styled } from '@mui/material/styles';
-import { Box, IconButton } from '@mui/material';
+5. **Build the component** (index.tsx)
+   - Document design principles
+   - Implement interactivity
+   - Add keyboard navigation
 
-export const FieldContainer = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'isDragging',
-})<{ isDragging: boolean }>(({ theme, isDragging }) => ({
-  backgroundColor: theme.palette.background.paper,
-  borderRadius: theme.shape.borderRadius,
-  // ... all styles
-}));
+6. **Test interactivity**
+   - Hover, click, keyboard
+   - Mobile touch targets
+   - Responsive breakpoints
 
-export const DragHandle = styled(IconButton, {
-  shouldForwardProp: (prop) => prop !== 'isVisible',
-})<{ isVisible: boolean }>(({ theme, isVisible }) => ({
-  opacity: isVisible ? 1 : 0,
-  // ... all styles
-}));
+7. **Review against checklist**
+   - Run through Code Review Checklist
+   - Fix any issues
+   - Commit
 
-// components/FormBuilder/Field/index.tsx
-import { FieldContainer, DragHandle } from './styles';
+---
 
-export const Field = () => {
-  return <FieldContainer>...</FieldContainer>
-}
-```
+## 🎓 EXAMPLES
 
-**Benefits:**
-- Clean separation of concerns (styling vs logic)
-- Easier to maintain and update styles
-- Better code organization and readability
-- Styles can be imported and reused across sub-components
+### Complete Component Example
 
-## Component Design Checklist
+See `components/Section/` for a complete example that follows ALL rules:
+- Proper structure (index.tsx, styles.ts, types.ts)
+- Design principles documented
+- Full interactivity (hover, click, keyboard)
+- Theme-based styling only
+- Responsive design
+- Accessibility
 
-When creating any component, verify:
+---
 
-- [ ] **Follows component structure convention** (PascalCase, index.tsx for integration)
-- [ ] **Styled components in separate styles.ts** (NEVER mix styled() with component logic)
-- [ ] Uses `styled()` or theme overrides (NOT sx prop for styling)
-- [ ] Uses theme colors (`theme.palette.*`)
-- [ ] Uses theme spacing (`theme.spacing()`)
-- [ ] Uses theme typography (`theme.typography.*`)
-- [ ] Explicitly applies relevant UX law (Jakob's, Fitts's, Hick's, Miller's)
-- [ ] Touch targets are 44x44px minimum on mobile
-- [ ] Responsive across breakpoints
-- [ ] Accessible (ARIA labels, keyboard navigation)
-- [ ] Consistent with other WizyVision components
-- [ ] No hardcoded values or arbitrary styling
-- [ ] Design decisions are documented in comments
+## 📞 WHEN IN DOUBT
 
-## Prototype Scope
+Ask yourself:
+1. Does this follow the theme? (colors, spacing, typography)
+2. Are design principles applied and documented?
+3. Is it interactive? (hover, click, keyboard)
+4. Is it in the right directory? (components vs features)
+5. Are styled components in styles.ts?
+6. Would a user find this familiar and easy to use?
 
-### Include:
-- Device preview toggle (mobile/tablet/desktop)
-- Pages list with create/reorder
-- Sections list with create/reorder
-- Fields list with drag-to-reorder between sections
-- Visual distinction between device layouts
-- Mock data pre-populated
+If any answer is "no" or "unsure", STOP and fix it before proceeding.
 
-### Exclude (Out of Scope):
-- Backend API integration
-- User authentication
-- Full CRUD (focus on read/create/reorder only)
-- Field type configuration details
-- Production error handling
-- Data persistence
+---
 
-## Success Criteria
-- Prototype loads and displays mock form structure
-- Device toggle changes preview container size
-- Pages/sections/fields can be reordered via drag & drop
-- **All UI follows WizyVision theme strictly**
-- **All styling uses styled() components, NOT sx prop**
-- **Design principles are explicitly applied and documented**
-- **Lo-fi designs start with functional components**
-- Responsive on actual devices
-- Code is clean, commented, and component-based
-- No hardcoded colors, spacing, or arbitrary values
-
-## Notes
-- This is a prototype for gathering feedback, not production code
-- Prioritize speed and clarity over completeness
-- Use mock data liberally
-- Focus on demonstrating the device-based layout concept
-- **MOST IMPORTANT: Stick to the theme. No arbitrary styling.**
+**REMEMBER**: This is a prototype for stakeholder feedback. Quality > Speed. Follow these rules strictly to ensure consistent, professional output.

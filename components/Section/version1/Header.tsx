@@ -16,21 +16,14 @@ import {
   DeleteButton,
   DeleteIcon,
 } from './styles';
+import { SectionHeaderProps } from './types';
 
-export interface SectionHeaderProps {
-  name: string;
-  isExpanded: boolean;
-  fieldCount: number;
-  isSystem?: boolean;
-  isHovered: boolean;
-  isDragging: boolean;
-  onToggle: () => void;
-  onRename: (newName: string) => void;
-  onDelete?: () => void;
-  dragListeners?: any;
-  dragAttributes?: any;
-}
-
+/**
+ * SectionHeader - Interactive header for Section component
+ *
+ * Handles inline editing, drag-and-drop, and section controls.
+ * See Section component for full UX principles documentation.
+ */
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
   name,
   isExpanded,
@@ -85,12 +78,13 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
         size="small"
         onClick={(e) => e.stopPropagation()}
         isVisible={isHovered || isDragging}
+        aria-label="Drag to reorder section"
       >
         <DragIcon />
       </DragHandle>
 
       {/* Expand/Collapse Button - Jakob's Law: Familiar pattern */}
-      <ExpandButton size="small">
+      <ExpandButton size="small" aria-label={isExpanded ? 'Collapse section' : 'Expand section'}>
         {isExpanded ? <ExpandIcon /> : <CollapseIcon />}
       </ExpandButton>
 
@@ -107,6 +101,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
             fullWidth
             size="small"
             variant="standard"
+            aria-label="Edit section name"
           />
         ) : (
           <NameEditArea onClick={handleNameClick}>
@@ -124,6 +119,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           size="small"
           onClick={handleDeleteClick}
           isVisible={isHovered}
+          aria-label="Delete section"
         >
           <DeleteIcon />
         </DeleteButton>
