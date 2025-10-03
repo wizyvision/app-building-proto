@@ -72,7 +72,7 @@ export default function FeatureOverviewPage() {
     <PageContainer>
       <BackLink href="/prototypes">← Back to Prototypes</BackLink>
 
-      <Typography variant="h3" gutterBottom sx={{ textTransform: 'capitalize' }}>
+      <Typography variant="h3" gutterBottom textTransform="capitalize">
         {featureName}
       </Typography>
       <Typography variant="body1" color="text.secondary" mb={4}>

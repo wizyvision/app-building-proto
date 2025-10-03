@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Box } from '@mui/material';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -67,6 +70,19 @@ export const Field = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(label);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+    data: {
+      type: 'field',
+    }
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.3 : 1,
+  };
 
   // Create fieldData for preview if not provided
   const previewFieldData: FieldData = fieldData || {
@@ -150,12 +166,12 @@ export const Field = ({
   };
 
   return (
-    <FieldContainer>
+    <FieldContainer ref={setNodeRef} style={style}>
       {/* Field Label Section */}
       <FieldLabel>
         <LeftSide>
-          <DragHandle>
-            <DragIndicatorIcon sx={{ fontSize: 24 }} />
+          <DragHandle {...attributes} {...listeners}>
+            <DragIndicatorIcon />
           </DragHandle>
           <LabelContainer>
             <LabelTextWrapper>
@@ -182,22 +198,24 @@ export const Field = ({
             aria-label="Edit field"
             disabled={!onEdit}
           >
-            <EditIcon sx={{ fontSize: 20 }} />
+            <EditIcon />
           </ActionButton>
           <ActionButton
             onClick={onMenuClick}
             aria-label="More options"
             disabled={!onMenuClick}
           >
-            <MoreVertIcon sx={{ fontSize: 20 }} />
+            <MoreVertIcon />
           </ActionButton>
         </RightSide>
       </FieldLabel>
 
       {/* Field Preview Section */}
-      <FieldPreview>
-        <FieldFactory field={previewFieldData} />
-      </FieldPreview>
+      {!isDragging && (
+        <FieldPreview>
+          <FieldFactory field={previewFieldData} />
+        </FieldPreview>
+      )}
     </FieldContainer>
   );
 };

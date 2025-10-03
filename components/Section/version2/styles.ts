@@ -1,8 +1,7 @@
 import { styled } from '@mui/material/styles';
 import { Box, Card, IconButton, TextField, Chip, Button } from '@mui/material';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
+import DragHandleIcon from '@mui/icons-material/DragHandle';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -63,9 +62,6 @@ export const DragHandle = styled(IconButton, {
   shouldForwardProp: (prop) => prop !== 'isVisible',
 })<{ isVisible: boolean }>(({ theme, isVisible }) => ({
   opacity: isVisible ? 1 : 0,
-  minWidth: theme.spacing(5.5), // 44px
-  minHeight: theme.spacing(5.5), // 44px
-  padding: theme.spacing(1),
   cursor: 'grab',
   transition: theme.transitions.create(['opacity'], {
     duration: theme.transitions.duration.shorter,
@@ -83,9 +79,6 @@ export const DragHandle = styled(IconButton, {
 // Jakob's Law: Familiar expand/collapse icon button
 // Fitts's Law: 44x44px minimum touch target
 export const ExpandButton = styled(IconButton)(({ theme }) => ({
-  minWidth: theme.spacing(5.5), // 44px
-  minHeight: theme.spacing(5.5), // 44px
-  padding: theme.spacing(1),
   transition: theme.transitions.create(['background-color', 'transform'], {
     duration: theme.transitions.duration.short,
   }),
@@ -98,18 +91,22 @@ export const ExpandButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
-export const ExpandIcon = styled(ExpandMoreIcon)(({ theme }) => ({
+// Version 2: Using unfold_less icon (replaces non-existent unfold_less_horizontal)
+// UnfoldLess provides two arrows pointing inward, rotated for expand/collapse states
+export const ExpandIcon = styled(UnfoldLessIcon)(({ theme }) => ({
   fontSize: theme.typography.body1.fontSize,
   transition: theme.transitions.create(['transform'], {
     duration: theme.transitions.duration.short,
   }),
 }));
 
-export const CollapseIcon = styled(ChevronRightIcon)(({ theme }) => ({
+export const CollapseIcon = styled(UnfoldLessIcon)(({ theme }) => ({
   fontSize: theme.typography.body1.fontSize,
+  transform: 'rotate(90deg)',
 }));
 
-export const DragIcon = styled(DragIndicatorIcon)(({ theme }) => ({
+// Version 2: Using drag_handle icon from Figma (horizontal drag indicator)
+export const DragIcon = styled(DragHandleIcon)(({ theme }) => ({
   fontSize: theme.typography.body1.fontSize,
 }));
 
@@ -173,9 +170,6 @@ export const DeleteButton = styled(IconButton, {
   shouldForwardProp: (prop) => prop !== 'isVisible',
 })<{ isVisible: boolean }>(({ theme, isVisible }) => ({
   opacity: isVisible ? 1 : 0,
-  minWidth: theme.spacing(5.5), // 44px
-  minHeight: theme.spacing(5.5), // 44px
-  padding: theme.spacing(1),
   color: theme.palette.error.main,
   transition: theme.transitions.create(['opacity', 'background-color'], {
     duration: theme.transitions.duration.shorter,
@@ -199,8 +193,10 @@ export const DeleteIcon = styled(DeleteOutlineIcon)(({ theme }) => ({
 // ========================================
 
 // Progressive Disclosure: Content only shown when expanded
+// Version 2: Background color #fafafa
 export const ContentContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(0, 2, 2, 2),
+  backgroundColor: '#fafafa',
 }));
 
 export const ContentInner = styled(Box)(({ theme }) => ({

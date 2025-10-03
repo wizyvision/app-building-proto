@@ -43,7 +43,7 @@ export const SectionContent: React.FC<SectionContentProps> = ({
   return (
     <Collapse in={isExpanded && !shouldCollapse} timeout={shouldCollapse ? 0 : "auto"} unmountOnExit>
       <ContentContainer>
-        <ContentInner>
+        <ContentInner padding={3}>
           {/* Empty State or Fields */}
           {!hasFields ? (
             <EmptyState
@@ -56,16 +56,6 @@ export const SectionContent: React.FC<SectionContentProps> = ({
           ) : (
             children
           )}
-
-          {/* Add Field Button - Fitts's Law: Centered for easy targeting */}
-          <AddFieldButton
-            variant="outlined"
-            startIcon={<AddFieldIcon />}
-            onClick={onAddField}
-            aria-label="Add new field to section"
-          >
-            Add Field
-          </AddFieldButton>
         </ContentInner>
       </ContentContainer>
     </Collapse>

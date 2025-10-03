@@ -10,13 +10,13 @@ import { SectionProps } from './types';
 import { SectionWrapper, SectionCard, CollapsedDropZone } from './styles';
 
 /**
- * Section Component - Version 1
+ * Section Component - Version 2
  *
  * VERSION INFO:
- * - Version: 1
- * - Created: 2025-10-02
- * - Initial implementation
- * - Features: Collapsible header, drag-and-drop, inline editing, field list
+ * - Version: 2
+ * - Created: 2025-10-03
+ * - Based on version 1 with updated styling
+ * - Features: Same behavior as v1, #fafafa content background, Figma wireframe icons
  *
  * COMPONENT STRUCTURE:
  * - Header: Drag handle, expand button, editable title, delete button

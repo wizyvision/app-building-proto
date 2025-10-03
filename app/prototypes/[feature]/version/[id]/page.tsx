@@ -48,7 +48,7 @@ export default function WireframeViewPage() {
         ← Back to {featureName}
       </BackLink>
 
-      <Typography variant="h3" gutterBottom sx={{ textTransform: 'capitalize' }}>
+      <Typography variant="h3" gutterBottom textTransform="capitalize">
         {featureName} - Version {versionId}
       </Typography>
 

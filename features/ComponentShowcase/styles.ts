@@ -105,3 +105,39 @@ export const ShowcaseContent = styled(Box)(({ theme }) => ({
   overflowY: 'auto',
   marginLeft: 240,
 }));
+
+// Section showcase specific styles
+export const FieldDropZoneBox = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isOver' && prop !== 'hasFields',
+})<{ isOver: boolean; hasFields: boolean }>(({ theme, isOver, hasFields }) => ({
+  minHeight: isOver ? theme.spacing(0.375) : (hasFields ? theme.spacing(0.25) : theme.spacing(7.5)),
+  height: isOver ? theme.spacing(0.375) : (hasFields ? theme.spacing(0.25) : theme.spacing(7.5)),
+  backgroundColor: isOver ? theme.palette.primary.main : hasFields ? theme.palette.grey[300] : theme.palette.grey[200],
+  borderRadius: theme.spacing(0.125),
+  marginTop: hasFields ? theme.spacing(0.125) : 0,
+  marginX: theme.spacing(0.25),
+  transition: 'all 0.2s',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: theme.palette.text.secondary,
+  fontSize: '0.75rem',
+  border: !hasFields ? '2px dashed' : 'none',
+  borderColor: isOver ? theme.palette.primary.main : theme.palette.grey[400],
+}));
+
+export const DropIndicatorBox = styled(Box)(({ theme }) => ({
+  height: theme.spacing(0.375),
+  backgroundColor: theme.palette.primary.main,
+  borderRadius: theme.spacing(0.125),
+  marginBottom: theme.spacing(0.125),
+  marginX: theme.spacing(0.25),
+}));
+
+export const DropIndicatorBoxBelow = styled(Box)(({ theme }) => ({
+  height: theme.spacing(0.375),
+  backgroundColor: theme.palette.primary.main,
+  borderRadius: theme.spacing(0.125),
+  marginTop: theme.spacing(0.125),
+  marginX: theme.spacing(0.25),
+}));

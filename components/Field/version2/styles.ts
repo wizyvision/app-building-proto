@@ -125,3 +125,11 @@ export const FieldPreview = styled(Box)(({ theme }) => ({
   overflow: 'hidden',
   width: '100%',
 }));
+
+export const DragOverlayContainer = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.common.white,
+  borderRadius: theme.spacing(1),
+  boxShadow: theme.shadows[8],
+  cursor: 'grabbing',
+  opacity: 0.95,
+}));

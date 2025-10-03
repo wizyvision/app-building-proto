@@ -16,12 +16,14 @@ import {
 } from './styles';
 import { Section } from './views/Section';
 import { Field } from './views/Field';
+import { FieldLibraryButton } from './views/FieldLibraryButton';
 
-type ShowcaseView = 'section' | 'field';
+type ShowcaseView = 'section' | 'field' | 'fieldLibraryButton';
 
 const navItems: { label: string; value: ShowcaseView }[] = [
   { label: 'Section', value: 'section' },
   { label: 'Field', value: 'field' },
+  { label: 'Field Library Button', value: 'fieldLibraryButton' },
 ];
 
 /**
@@ -73,12 +75,13 @@ export const ComponentShowcase: React.FC = () => {
   const [selectedView, setSelectedView] = useState<ShowcaseView>('section');
   const router = useRouter();
 
-  const renderContent = () => {
-    if (selectedView === 'field') {
-      return <Field />;
-    }
-    return <Section />;
+  const contentMap: Record<ShowcaseView, React.ReactNode> = {
+    section: <Section />,
+    field: <Field />,
+    fieldLibraryButton: <FieldLibraryButton />,
   };
+
+  const renderContent = () => contentMap[selectedView];
 
   return (
     <ShowcaseLayout>
