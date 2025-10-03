@@ -9,14 +9,14 @@ export const ButtonContainer = styled(Box)<{ disabled?: boolean; 'data-type'?: s
   backgroundColor: disabled
     ? theme.palette.grey[100]
     : dataType === 'section'
-      ? '#e6f7ff'  // Light blue background for sections
+      ? theme.palette.secondary[1]  // Light blue background for sections
       : theme.palette.common.white,
   borderRadius: '8px',
   marginBottom: theme.spacing(1),
   cursor: disabled ? 'not-allowed' : 'grab',
   opacity: disabled ? 0.5 : 1,
   transition: 'all 200ms',
-  border: dataType === 'section' ? '1px solid #91d5ff' : 'none',
+  border: dataType === 'section' ? '1px solid' + theme.palette.secondary[5] : 'none',
   '&:hover': {
     backgroundColor: disabled
       ? theme.palette.grey[100]

@@ -11,10 +11,8 @@ import AddIcon from '@mui/icons-material/Add';
 
 // Jakob's Law: Familiar accordion/section pattern
 export const SectionWrapper = styled(Box)({
-  minWidth: '500px',
-  maxWidth: '700px',
   width: '100%',
-  margin: '0 auto',
+  boxSizing: 'border-box',
 });
 
 // Visual Hierarchy: Card elevation distinguishes sections from fields
@@ -30,6 +28,7 @@ export const SectionCard = styled(Card)(({ theme }) => ({
   '&:hover': {
     boxShadow: theme.customShadows.z2,
   },
+  boxSizing: 'border-box',
 }));
 
 // ========================================
