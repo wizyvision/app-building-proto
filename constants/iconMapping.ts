@@ -22,6 +22,7 @@ import {
   DateRange,
   LocalOffer as LocalOfferIcon,
   RadioButtonChecked,
+  ViewModule,
 } from '@mui/icons-material';
 
 export const iconMapping = {
@@ -48,4 +49,5 @@ export const iconMapping = {
   SCHEDULE: DateRange,
   TAGS_DROPDOWN: LocalOfferIcon,
   MULTIPLE_CHOICE: RadioButtonChecked,
+  SECTION: ViewModule,
 };

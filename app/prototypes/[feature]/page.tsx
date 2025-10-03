@@ -4,7 +4,9 @@ import React from 'react';
 import { Typography, Card, CardContent, CardActionArea, Grid, Chip } from '@mui/material';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { styled } from '@mui/material/styles';
+import { getFeatureMetadata } from '@/config/featureRegistry';
 
 const PageContainer = styled('div')(({ theme }) => ({
   padding: theme.spacing(4),
@@ -40,7 +42,8 @@ const BackLink = styled(Link)(({ theme }) => ({
 /**
  * Feature Overview Page
  *
- * Shows all versions of a specific feature as case study cards
+ * Dynamically shows all versions of any feature using the feature registry.
+ * This page works for any feature without needing to be modified.
  *
  * UX PRINCIPLES APPLIED:
  * - Jakob's Law: Timeline/version list pattern from GitHub, Figma
@@ -49,24 +52,17 @@ const BackLink = styled(Link)(({ theme }) => ({
  */
 export default function FeatureOverviewPage() {
   const params = useParams();
-  const featureName = String(params.feature).replace(/-/g, ' ');
+  const featureSlug = params.feature as string;
 
-  const versions = [
-    {
-      id: 'v1',
-      version: '1.0',
-      date: '2024-09-15',
-      description: 'Initial wireframe with basic section and field management',
-      isLatest: false,
-    },
-    {
-      id: 'v2',
-      version: '2.0',
-      date: '2024-10-01',
-      description: 'Enhanced with device preview, drag-and-drop, and interactive components',
-      isLatest: true,
-    },
-  ];
+  // Get feature metadata from registry
+  const featureMetadata = getFeatureMetadata(featureSlug);
+
+  // If feature doesn't exist, show 404
+  if (!featureMetadata) {
+    notFound();
+  }
+
+  const { name: featureName, versions } = featureMetadata;
 
   return (
     <PageContainer>

@@ -1,4 +1,4 @@
-import type { FieldData } from '../../features/FormFields';
+import type { FieldData } from '@/features/FormFields';
 
 export interface FieldProps {
   id: string;

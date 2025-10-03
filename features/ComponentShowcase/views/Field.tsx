@@ -63,6 +63,7 @@ export const Field: React.FC = () => {
           id={field.id}
           label={field.label}
           type={field.type}
+          sectionId="showcase"
           onEditLabel={(newLabel: string) =>
             console.log('Edit label:', field.id, newLabel)
           }

@@ -457,6 +457,7 @@ export const Section: React.FC = () => {
                           } } onMenuOpen={function (event: React.MouseEvent<HTMLButtonElement>): void {
                             throw new Error('Function not implemented.');
                           } } {...field}
+                          sectionId={section.id}
                           onLabelChange={(newLabel: string) => handleFieldEditLabel(section.id, field.id, newLabel)}
                           onEdit={() => handleFieldEdit(section.id, field.id)}                            // onMenuClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>
                             //   handleFieldMenuOpen(section.id, field.id, event)
@@ -481,13 +482,14 @@ export const Section: React.FC = () => {
               <Field
                   onEditLabel={function (newLabel: string): void {
                     throw new Error('Function not implemented.');
-                  } } 
+                  } }
                   onMenuOpen={function (event: React.MouseEvent<HTMLButtonElement>): void {
                     throw new Error('Function not implemented.');
                   } } {...activeField}
+                  sectionId=""
                   onLabelChange={() => { } }
                   onEdit={() => { } }
-                  onMenuClick={() => { } }             
+                  onMenuClick={() => { } }
               />
             </DragOverlayContainer>
           ) : null}

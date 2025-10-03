@@ -1,75 +1,83 @@
 'use client';
 
-import React from 'react';
-import { Typography, Paper } from '@mui/material';
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { styled } from '@mui/material/styles';
-
-const PageContainer = styled('div')(({ theme }) => ({
-  padding: theme.spacing(4),
-  maxWidth: theme.breakpoints.values.xl,
-  margin: '0 auto',
-}));
-
-const BackLink = styled(Link)(({ theme }) => ({
-  display: 'inline-block',
-  marginBottom: theme.spacing(3),
-  color: theme.palette.primary.main,
-  textDecoration: 'none',
-  '&:hover': {
-    textDecoration: 'underline',
-  },
-}));
-
-const WireframeContainer = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(4),
-  marginTop: theme.spacing(3),
-  backgroundColor: theme.palette.background[2],
-}));
+import { notFound } from 'next/navigation';
+import FormBuilderV1 from '@/features/FormBuilder/version1';
+import FormBuilderV2 from '@/features/FormBuilder/version2';
 
 /**
- * Wireframe/Design View Page
+ * Prototype Version Router
  *
- * Displays specific wireframe or design iteration
+ * This component dynamically loads the appropriate version of any feature prototype
+ * based on the URL parameters. This pattern makes it easy to:
+ * - Add new features without modifying this file
+ * - Add new versions to existing features
+ * - Keep feature and version logic completely separated
+ * - Maintain a single entry point for all prototypes
+ *
+ * ARCHITECTURE PATTERN:
+ * - This file acts as a feature + version registry/router
+ * - Each feature has its own directory in /features/{FeatureName}
+ * - Each version is in /features/{FeatureName}/version{N}/index.tsx
+ * - Shared utilities are in /utils
+ * - Mock data is in /mocks
+ * - Reusable components are in /components
+ *
+ * HOW TO ADD A NEW FEATURE (e.g., UserManagement):
+ * 1. Create /features/UserManagement/version1/index.tsx
+ * 2. Import: import UserManagementV1 from '@/features/UserManagement/version1';
+ * 3. Add to featureRegistry: 'user-management': { v1: UserManagementV1 }
+ * 4. That's it! Route /prototypes/user-management/version/v1 will work
+ *
+ * HOW TO ADD A NEW VERSION TO EXISTING FEATURE (e.g., FormBuilder v3):
+ * 1. Create /features/FormBuilder/version3/index.tsx
+ * 2. Import: import FormBuilderV3 from '@/features/FormBuilder/version3';
+ * 3. Add to form-builder versions: v3: FormBuilderV3
+ * 4. Route /prototypes/form-builder/version/v3 will work
+ *
+ * SUPPORTED FEATURES:
+ * - form-builder: v1 (two-column), v2 (three-column with field library)
  *
  * UX PRINCIPLES APPLIED:
- * - Jakob's Law: Full-page design view like Figma, InVision
- * - Visual Hierarchy: Clear navigation back to feature overview
+ * - Hick's Law: Clear separation of features and versions reduces cognitive load
+ * - Jakob's Law: Consistent routing pattern across all features
  */
-export default function WireframeViewPage() {
+
+// Feature + Version registry: Maps feature slugs to their version components
+const featureRegistry: Record<string, Record<string, React.ComponentType<{ featureName: string; versionId: string }>>> = {
+  'form-builder': {
+    v1: FormBuilderV1,
+    v2: FormBuilderV2,
+    // v3: FormBuilderV3, // Add future versions here
+  },
+  // 'user-management': {
+  //   v1: UserManagementV1,
+  // },
+  // Add more features here
+};
+
+export default function PrototypeVersionPage() {
   const params = useParams();
-  const featureName = String(params.feature).replace(/-/g, ' ');
-  const versionId = params.id;
+  const featureSlug = params.feature as string;
+  const versionId = params.id as string;
+  const featureName = String(featureSlug).replace(/-/g, ' ');
 
-  return (
-    <PageContainer>
-      <BackLink href={`/prototypes/${params.feature}`}>
-        ← Back to {featureName}
-      </BackLink>
+  // Get the feature's version map
+  const featureVersions = featureRegistry[featureSlug];
 
-      <Typography variant="h3" gutterBottom textTransform="capitalize">
-        {featureName} - Version {versionId}
-      </Typography>
+  // If feature doesn't exist, show 404
+  if (!featureVersions) {
+    notFound();
+  }
 
-      <WireframeContainer>
-        <Typography variant="h5" gutterBottom>
-          Wireframe Placeholder
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          This page would display the actual wireframe, design mockup, or interactive prototype.
-          <br /><br />
-          In a full implementation, this could include:
-          <br />
-          • Figma embed or screenshot
-          <br />
-          • Interactive prototype iframe
-          <br />
-          • Design annotations and specifications
-          <br />
-          • Feedback and comment threads
-        </Typography>
-      </WireframeContainer>
-    </PageContainer>
-  );
+  // Get the appropriate version component
+  const VersionComponent = featureVersions[versionId];
+
+  // If version doesn't exist, show 404
+  if (!VersionComponent) {
+    notFound();
+  }
+
+  // Render the version-specific component
+  return <VersionComponent featureName={featureName} versionId={versionId} />;
 }

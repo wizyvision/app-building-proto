@@ -7,6 +7,7 @@ export const FileListField = ({ field }: FieldPreviewProps) => {
   return (
     <FileUploadContainer>
       <UploadButton
+        // @ts-expect-error - component prop typing issue with styled Button
         component="label"
         variant="outlined"
         startIcon={<CloudUploadIcon />}

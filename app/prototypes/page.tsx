@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { styled } from '@mui/material/styles';
+import { getAllFeatures } from '@/config/featureRegistry';
 
 const PageContainer = styled('div')(({ theme }) => ({
   padding: theme.spacing(4),
@@ -47,15 +48,6 @@ const FeatureCard = styled(Card)(({ theme }) => ({
   },
 }));
 
-const features = [
-  {
-    id: 'form-builder',
-    name: 'Form Builder',
-    description: 'Device-based form layout builder with sections and fields',
-    versions: 2,
-  },
-];
-
 /**
  * Prototypes Landing Page
  *
@@ -74,6 +66,14 @@ const features = [
  */
 export default function PrototypesPage() {
   const router = useRouter();
+
+  // Get features dynamically from registry
+  const features = getAllFeatures().map((feature) => ({
+    id: feature.slug,
+    name: feature.name,
+    description: feature.description,
+    versions: feature.versions.length,
+  }));
 
   return (
     <PageContainer>

@@ -79,6 +79,7 @@ export const Field: React.FC<FieldProps> = ({
   id,
   label,
   type,
+  sectionId,
   onEditLabel,
   onEdit,
   onMenuOpen,
@@ -91,6 +92,7 @@ export const Field: React.FC<FieldProps> = ({
     id,
     data: {
       type: 'field',
+      sectionId,
     }
   });
 

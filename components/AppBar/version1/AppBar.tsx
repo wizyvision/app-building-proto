@@ -1,4 +1,5 @@
-import { AppBar as MuiAppBar, Toolbar, Box, Avatar, Typography } from '@mui/material';
+import { AppBar as MuiAppBar, Toolbar, Box, Avatar, Typography, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 /**
  * AppBar Component - Version 1
@@ -11,12 +12,19 @@ import { AppBar as MuiAppBar, Toolbar, Box, Avatar, Typography } from '@mui/mate
  * UX PRINCIPLES APPLIED:
  * - Jakob's Law: Familiar top app bar pattern (standard across web/mobile apps)
  * - Visual Hierarchy: App name prominent on left, user avatar on right
- * - Fitts's Law: Avatar positioned in easy-reach corner area
+ * - Fitts's Law: Avatar positioned in easy-reach corner area, back button 44x44px
  *
  * INTERACTIONS:
- * - None (visual shell only, no menus/navigation)
+ * - Optional back button for navigation
  */
-export const AppBar = () => {
+
+interface AppBarProps {
+  showBackButton?: boolean;
+  onBackClick?: () => void;
+  title?: string;
+}
+
+export const AppBar = ({ showBackButton = false, onBackClick, title = 'Form Builder' }: AppBarProps) => {
   return (
     <MuiAppBar
       position="fixed"
@@ -36,9 +44,26 @@ export const AppBar = () => {
           alignItems: 'center',
         }}
       >
-        <Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {showBackButton && (
+            <IconButton
+              onClick={onBackClick}
+              aria-label="Back"
+              sx={{
+                minWidth: 44,
+                minHeight: 44,
+                color: 'text.primary',
+                '&:hover': {
+                  backgroundColor: 'action.hover',
+                  color: 'primary.main',
+                },
+              }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          )}
           <Typography variant="h6" color="text.primary">
-            Form Builder
+            {title}
           </Typography>
         </Box>
 

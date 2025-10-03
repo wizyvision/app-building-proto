@@ -16,7 +16,7 @@ export const FieldContainer = styled(Box, {
   boxShadow: theme.customShadows.z1,
   display: 'flex',
   alignItems: 'center',
-  minHeight: theme.spacing(7.75), // 62px
+  minHeight: theme.spacing(7), // 56px
   padding: theme.spacing(1.5, 2),
   gap: theme.spacing(1.5),
   cursor: isDragging ? 'grabbing' : 'default',
@@ -39,9 +39,6 @@ export const DragHandle = styled(IconButton, {
   shouldForwardProp: (prop) => prop !== 'isVisible',
 })<{ isVisible: boolean }>(({ theme, isVisible }) => ({
   opacity: isVisible ? 1 : 0,
-  minWidth: theme.spacing(5.5), // 44px
-  minHeight: theme.spacing(5.5), // 44px
-  padding: theme.spacing(1),
   cursor: 'grab',
   transition: theme.transitions.create(['opacity'], {
     duration: theme.transitions.duration.shorter,
@@ -63,7 +60,6 @@ export const LabelContainer = styled(Box)({
 
 export const LabelEditArea = styled(Box)(({ theme }) => ({
   cursor: 'text',
-  padding: theme.spacing(0.5, 0),
   borderRadius: theme.shape.borderRadius,
   transition: theme.transitions.create(['background-color'], {
     duration: theme.transitions.duration.shortest,
@@ -76,7 +72,6 @@ export const LabelEditArea = styled(Box)(({ theme }) => ({
 export const LabelText = styled('p')(({ theme }) => ({
   margin: 0,
   fontSize: theme.typography.body2.fontSize, // ~14px
-  lineHeight: theme.spacing(2.5), // 20px
   color: theme.palette.text.primary,
   fontWeight: theme.typography.fontWeightRegular, // 400
 }));
@@ -96,41 +91,22 @@ export const ActionButtonGroup = styled(Box, {
 
 // Fitts's Law: 44x44px touch target for action buttons
 export const ActionButton = styled(IconButton)(({ theme }) => ({
-  minWidth: theme.spacing(5.5), // 44px
-  minHeight: theme.spacing(5.5), // 44px
-  padding: theme.spacing(1),
-  transition: theme.transitions.create(['background-color', 'color'], {
-    duration: theme.transitions.duration.short,
-  }),
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-  },
-  '&:focus-visible': {
-    outline: `2px solid ${theme.palette.primary.main}`,
-    outlineOffset: 2,
-  },
 }));
 
 export const ActionIcon = styled(EditIcon)(({ theme }) => ({
-  fontSize: theme.typography.body2.fontSize,
   color: theme.palette.primary.main,
 }));
 
 export const MenuIcon = styled(MoreVertIcon)(({ theme }) => ({
-  fontSize: theme.typography.body2.fontSize,
   color: theme.palette.text.secondary,
 }));
 
 export const DragIcon = styled(DragIndicatorIcon)(({ theme }) => ({
-  fontSize: theme.typography.body2.fontSize,
   color: theme.palette.text.disabled,
 }));
 
 export const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiInput-root': {
     fontSize: theme.typography.body2.fontSize,
-  },
-  '& .MuiInput-input': {
-    padding: theme.spacing(0.5, 0),
   },
 }));
