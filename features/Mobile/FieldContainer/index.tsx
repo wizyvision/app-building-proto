@@ -30,6 +30,7 @@ interface FieldContainerProps {
   label: string;
   description?: string;
   children: React.ReactNode;
+  isRequired?: boolean;
   showActions?: boolean;
   hasMedia?: boolean;
   hasRemarks?: boolean;
@@ -41,6 +42,7 @@ export const FieldContainer = ({
   label,
   description,
   children,
+  isRequired = false,
   showActions = false,
   hasMedia = false,
   hasRemarks = false,
@@ -51,7 +53,10 @@ export const FieldContainer = ({
     <StyledPaper elevation={0} data-name="FieldContainer">
       {/* Field Label & Description */}
       <LabelDescriptionContainer>
-        <FieldLabel>{label}</FieldLabel>
+        <FieldLabel>
+          {label}
+          {isRequired && <span style={{ color: '#eb4236' }}> *</span>}
+        </FieldLabel>
         {description && <FieldDescription>{description}</FieldDescription>}
       </LabelDescriptionContainer>
 

@@ -929,12 +929,203 @@ import { designTokens } from '@/theme/designTokens';
 
 ---
 
+## 🎨 FIGMA TO COMPONENT WORKFLOW (STRICT)
+
+### When Implementing from Figma Design
+
+**MANDATORY STEPS - NEVER SKIP:**
+
+1. **Extract Figma Specifications FIRST**
+   ```typescript
+   // Use get_code tool to get exact CSS/Tailwind classes
+   // Use get_screenshot tool to see visual design
+   ```
+
+2. **List ALL Specifications Before Coding**
+   - Background color (exact hex)
+   - Border (width, color, radius)
+   - Padding (all sides - exact px)
+   - Height/Width (exact px)
+   - Font (size, weight, line-height, letter-spacing)
+   - Icon sizes (exact px)
+   - Spacing between elements (exact px)
+
+3. **Create Checklist from Figma Export**
+   ```
+   From Figma node-id: XXX-XXX
+   - [ ] Background: #faf3f3
+   - [ ] Border: 1px solid #eb4236
+   - [ ] Padding: 4px 0px 4px 16px
+   - [ ] Min height: 40px
+   - [ ] Icon container: 48x48px
+   - [ ] Icon: 24x24px (default MUI size)
+   - [ ] Font empty: 16px / 24px / 0.5px
+   - [ ] Font value: 14px / 20px / 0.25px
+   ```
+
+4. **Confirm Before Implementation**
+   - Ask: "Should I use exact Figma values or map to theme tokens?"
+   - For mobile components: Use EXACT Figma specs
+   - For web components: Map to theme where appropriate
+
+5. **Implement in This Order**
+   - Create styled component with EXACT Figma values
+   - Test against Figma screenshot
+   - Only then refactor to theme tokens (if approved)
+
+### Figma CSS Translation Rules
+
+**From Figma Tailwind → MUI styled():**
+
+```typescript
+// Figma: className="bg-[#faf3f3] p-[16px] rounded-[4px]"
+// MUI:
+const StyledComponent = styled(Box)({
+  backgroundColor: '#faf3f3',  // Use exact hex from Figma
+  padding: '16px',              // Use exact px from Figma
+  borderRadius: '4px',          // Use exact px from Figma
+});
+```
+
+**Common Figma → MUI Mappings:**
+
+| Figma Tailwind | MUI Styled |
+|----------------|------------|
+| `pl-[16px]` | `paddingLeft: '16px'` |
+| `py-[4px]` | `padding: '4px 0'` |
+| `h-[40px]` | `height: '40px'` |
+| `size-[48px]` | `width: '48px', height: '48px'` |
+| `gap-[10px]` | `gap: '10px'` |
+| `border border-[#eb4236]` | `border: '1px solid #eb4236'` |
+| `rounded-[4px]` | `borderRadius: '4px'` |
+| `text-[14px]` | `fontSize: '14px'` |
+| `leading-[20px]` | `lineHeight: '20px'` |
+| `tracking-[0.25px]` | `letterSpacing: '0.25px'` |
+
+### CRITICAL RULES for Figma Implementation
+
+**1. Use EXACT values from Figma first**
+```typescript
+// ✅ CORRECT - First implementation
+const StyledField = styled(TextField)({
+  backgroundColor: '#faf3f3',     // Exact from Figma
+  padding: '4px 0px 4px 16px',   // Exact from Figma
+  minHeight: '48px',             // Exact from Figma
+});
+```
+
+**2. NO theme mapping without approval**
+```typescript
+// ❌ WRONG - Don't assume theme mapping
+const StyledField = styled(TextField)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,  // Guessing!
+  padding: theme.spacing(0.5, 0, 0.5, 2),          // Converting!
+}));
+```
+
+**3. Compare against Figma screenshot**
+- Take screenshot of implementation
+- Compare side-by-side with Figma
+- Fix ANY visual differences
+
+**4. Document Figma source**
+```typescript
+/**
+ * Component Name
+ *
+ * Figma Reference: node-id XXX-XXX
+ * Design Specs:
+ * - Background: #faf3f3
+ * - Padding: 4px 0px 4px 16px
+ * - Min height: 48px
+ * - Icons: 48x48px containers, 24x24px icons
+ */
+```
+
+### Mobile Component Rules
+
+**For mobile-specific components:**
+- ALWAYS use exact Figma specifications
+- DO NOT use theme tokens by default
+- Background colors, borders, sizes are EXACT
+- Only use theme for colors if explicitly web/mobile shared
+
+**Why?**
+- Mobile UI often differs from web design system
+- Figma designs are pixel-perfect for mobile
+- Theme tokens are optimized for web
+
+### Example: Figma to Component (Complete)
+
+```typescript
+// Step 1: Get Figma code and screenshot
+// Step 2: List specifications
+/**
+ * TextField - Mobile Multiline
+ *
+ * Figma: node-id 320-1778
+ * Specifications:
+ * - Background: #faf3f3
+ * - Border: 1px solid #eb4236
+ * - Border (focused): 0px 0px 2px #eb4236
+ * - Padding: 4px 0px 4px 16px
+ * - Height (content): 40px
+ * - Height (total): 48px (40px + 4px + 4px)
+ * - Icon container: 48x48px
+ * - Icon: 24px (MUI default)
+ * - Font (empty): 16px/24px/0.5px
+ * - Font (value): 14px/20px/0.25px
+ */
+
+// Step 3: Implement with EXACT values
+export const StyledTextField = styled(TextField)({
+  width: '100%',
+
+  '& .MuiInputBase-root': {
+    backgroundColor: '#faf3f3',
+    borderRadius: '4px',
+    padding: '4px 0px 4px 16px',
+    alignItems: 'center',
+    minHeight: '48px',
+  },
+
+  '& .MuiInputBase-input': {
+    padding: 0,
+    height: '40px',
+    fontSize: '16px',
+    fontWeight: 400,
+    lineHeight: '24px',
+    letterSpacing: '0.5px',
+    color: '#1d1b20',
+  },
+
+  '& .MuiInputBase-input:not(:placeholder-shown)': {
+    fontSize: '14px',
+    lineHeight: '20px',
+    letterSpacing: '0.25px',
+  },
+
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      border: '1px solid #eb4236',
+      borderRadius: '4px',
+    },
+    '&.Mui-focused fieldset': {
+      border: 0,
+      borderBottom: '2px solid #eb4236',
+      borderRadius: '4px 4px 0 0',
+    },
+  },
+});
+```
+
 ## 🚀 DEVELOPMENT WORKFLOW
 
 1. **Understand the requirement**
    - What page/component am I building?
    - Is it smart (features) or dumb (components)?
    - What UX principles apply?
+   - **Is there a Figma design?** If YES, use Figma workflow above
 
 2. **Create the structure**
    - Create folder in correct directory
@@ -946,16 +1137,19 @@ import { designTokens } from '@/theme/designTokens';
    - Event handlers
 
 4. **Create styled components** (styles.ts)
-   - Use theme values only
+   - **If Figma design:** Use exact Figma values first
+   - **If no Figma:** Use theme values
    - Apply responsive breakpoints
    - Add hover/active/focus states
 
 5. **Build the component** (index.tsx)
    - Document design principles
+   - **Document Figma reference** (if applicable)
    - Implement interactivity
    - Add keyboard navigation
 
-6. **Test interactivity**
+6. **Test against design**
+   - **If Figma:** Compare screenshot to implementation
    - Hover, click, keyboard
    - Mobile touch targets
    - Responsive breakpoints

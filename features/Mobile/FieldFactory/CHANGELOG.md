@@ -1,5 +1,107 @@
 # Mobile FieldFactory - Changelog
 
+## 2025-10-06 - Field Implementation Complete
+
+### Completed Field Components
+
+All 7 mobile field components have been implemented following Figma designs and using theme tokens:
+
+1. **BaseField (Shared Component)**
+   - Location: `features/Mobile/FieldFactory/BaseField/index.tsx`
+   - Purpose: Shared styled TextField for text-based fields
+   - Figma Reference: node-id 320-1778
+   - Features:
+     - Height: 40px
+     - Background: #faf3f3
+     - Border: 1px solid primary, 2px bottom when focused
+     - No box shadow on focus
+     - Uses theme spacing and mobileTokens
+   - Used by: Description, Paragraph, Text, Title
+
+2. **Description & Paragraph Fields**
+   - Multiline text fields with mic and clear icons
+   - Icon buttons: 40x40px (adapts to field height)
+   - Auto-expanding textarea
+   - Shared StyledTextField from BaseField
+
+3. **Text & Title Fields**
+   - Single line text fields (no multiline)
+   - Same styling as Description/Paragraph
+   - Mic and clear icons
+
+4. **Status Field**
+   - Location: `features/Mobile/FieldFactory/Status/`
+   - Figma Reference: node-id 320-4865
+   - Features:
+     - Dropdown with dynamic background color based on selected status
+     - Empty state: #ffedea background with "Select a status" placeholder
+     - Selected state: Uses status.color as background with white text
+     - ArrowDropDown icon
+     - Styles in styles.ts using theme tokens
+   - Mock Data: `mockStatuses` in mockData.ts (6 statuses: Open, Closed, Test, Blue, Green, Red)
+
+5. **Privacy Field**
+   - Location: `features/Mobile/FieldFactory/Privacy/`
+   - Figma Reference: node-id 320-15644
+   - Features:
+     - Dropdown with leading PolicyIcon
+     - Background: #ffedea
+     - Icon color: primary[8]
+     - Box shadow: 0px 1.5px 4px 0px rgba(0,0,0,0.25)
+     - ArrowDropDown trailing icon (24px)
+     - Styles in styles.ts using theme tokens
+   - Mock Data: `mockPrivacies` in mockData.ts (3 options: confidential, public, standard)
+
+6. **Signature Field**
+   - Location: `features/Mobile/FieldFactory/Signature/`
+   - Figma Reference: node-id 322-7480
+   - Features:
+     - Display/canvas area: 144px height, white background, 1px border
+     - Empty state: completely empty white box
+     - Displays signature image when value exists
+     - Attach button: #fff0ee background with Edit icon (always visible)
+     - Remove button: gray text button (only when signature exists)
+     - Action buttons aligned right with 12px gap
+     - Styles in styles.ts using theme spacing
+
+### Shared Mobile Components
+
+**MobileInputComponents** (`components/shared/MobileInputComponents.tsx`)
+- `StyledInputAdornment`: 40px height (adapts to field height)
+- `StyledIconButton`: 40x40px with primary color, 8px padding
+
+**Mock Data** (`features/Mobile/FieldFactory/mockData.ts`)
+- Status interface and mockStatuses array
+- Privacy interface and mockPrivacies array
+- FieldValueResponse interface and mockFieldValue
+
+### Theme Tokens
+
+**Mobile Tokens** (`theme/mobileTokens.ts`)
+- Field colors: background (#faf3f3), emptyStatus (#ffedea)
+- Text colors: primary (#1d1b20), statusEmpty (#271815), statusSelected (#ffffff)
+- Field dimensions: height (40px), borderRadius (4px)
+- Icon button dimensions: size (40px), iconSize (24px)
+
+**Global Design Tokens** (`theme/designTokens.ts`)
+- Added status colors (global for mobile & web):
+  - open: #818181
+  - closed: #4F546A
+  - test: #FF9A43
+  - blue: #4384FF
+  - green: #20D056
+  - red: #D85642
+
+### Styling Standards Applied
+
+All field components now follow these standards:
+- ✅ Styles in separate `styles.ts` files
+- ✅ Use `theme.spacing()` instead of hardcoded px values
+- ✅ Use `mobileTokens` for mobile-specific dimensions and colors
+- ✅ Use `designTokens` for global colors (status colors)
+- ✅ No inline `sx` props
+- ✅ All styled components use `styled()` from `@mui/material/styles`
+
 ## Initial Setup - 2025-10-06
 
 ### Field Type Mapping Reference

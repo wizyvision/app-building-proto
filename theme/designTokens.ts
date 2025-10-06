@@ -107,6 +107,15 @@ export const designTokens = {
       label: '#797979',
       thumbnailButton: '#ededed',
     },
+    // Status colors (global - used in both mobile and web)
+    status: {
+      open: '#818181',
+      closed: '#4F546A',
+      test: '#FF9A43',
+      blue: '#4384FF',
+      green: '#20D056',
+      red: '#D85642',
+    },
   },
   typography: {
     fontFamily: '"Public Sans", "Helvetica", "Arial", sans-serif',
