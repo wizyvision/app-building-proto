@@ -33,9 +33,8 @@ export const DragHandle = styled(Box)(({ theme }) => ({
   flexShrink: 0,
   cursor: 'grab',
 
-  // Rotate the icon 270 degrees as per Figma
-  '& svg': {
-    transform: 'rotate(270deg)',
+  '&:active': {
+    cursor: 'grabbing',
   },
 
   // Fitts's Law: Adequate touch target

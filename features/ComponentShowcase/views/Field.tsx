@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Field as FieldV1 } from '@/components/Field/version1';
 import { Field as FieldV2 } from '@/components/Field/version2';
+import { Field as FieldV5 } from '@/components/Field/version5';
 import { VersionTabs } from '@/components/shared/VersionTabs';
 import { VersionInfo } from '@/components/shared/VersionInfo';
 import {
@@ -37,14 +38,29 @@ const FIELD_VERSIONS = [
   },
   {
     version: 2,
-    date: 'October 2, 2025',
-    description: 'Simplified design with cleaner inline editing and progressive disclosure',
+    date: 'October 7, 2025',
+    description: 'Two-section layout with field preview (Figma Version 2)',
     features: [
-      'Drag handle with vertical drag indicator icon',
-      'Click label to edit inline',
-      'Press Enter to save, Escape to cancel',
-      'Edit and menu icons hidden until hover',
-      'Cleaner visual hierarchy',
+      'Drag handle with 6 vertical dots',
+      'Header section with drag handle + label + actions',
+      'Preview section showing actual field component',
+      'Inline label editing',
+      'Ghost state when dragging',
+      'Drag over state with shadow',
+      'Uses FieldFactory for preview',
+      '24x24px touch targets (Fitts\'s Law)',
+    ],
+  },
+  {
+    version: 5,
+    date: 'October 7, 2025',
+    description: 'Compact design with custom drag icon (Figma Version 3)',
+    features: [
+      'Custom 16x16px drag icon',
+      'Content section with label',
+      'Inline label editing',
+      'Ghost state: Semi-transparent when dragging',
+      'Drag over state: Shadow when another field hovers',
       '24x24px touch targets (Fitts\'s Law)',
     ],
   },
@@ -71,6 +87,38 @@ export const Field: React.FC = () => {
           onMenuOpen={(event: React.MouseEvent<HTMLButtonElement>) =>
             console.log('Open menu:', field.id)
           }
+        />
+      ));
+    }
+
+    if (currentVersion === 2) {
+      return mockFields.map((field) => (
+        <FieldV2
+          key={field.id}
+          id={field.id}
+          label={field.label}
+          type={field.type}
+          onLabelChange={(newLabel: string) =>
+            console.log('Label changed:', field.id, newLabel)
+          }
+          onEdit={() => console.log('Edit field:', field.id)}
+          onMenuClick={() => console.log('Menu clicked:', field.id)}
+        />
+      ));
+    }
+
+    if (currentVersion === 5) {
+      return mockFields.map((field) => (
+        <FieldV5
+          key={field.id}
+          id={field.id}
+          label={field.label}
+          type={field.type}
+          onLabelChange={(newLabel: string) =>
+            console.log('Label changed:', field.id, newLabel)
+          }
+          onEdit={() => console.log('Edit field:', field.id)}
+          onMenuClick={() => console.log('Menu clicked:', field.id)}
         />
       ));
     }

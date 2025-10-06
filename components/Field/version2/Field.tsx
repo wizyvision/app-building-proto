@@ -2,12 +2,12 @@ import { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Box } from '@mui/material';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { FieldFactory } from '@/features/FormFields';
 import type { FieldData } from '@/features/FormFields';
 import { FieldProps } from './types';
+import { DragIcon } from './DragIcon';
 import {
   FieldContainer,
   FieldLabel,
@@ -171,7 +171,7 @@ export const Field = ({
       <FieldLabel>
         <LeftSide>
           <DragHandle {...attributes} {...listeners}>
-            <DragIndicatorIcon />
+            <DragIcon />
           </DragHandle>
           <LabelContainer>
             <LabelTextWrapper>
