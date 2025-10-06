@@ -1,5 +1,59 @@
 # Mobile FieldFactory - Changelog
 
+## 2025-10-07 - Added SELECT and DOUBLE Fields
+
+### New Field Components
+
+8. **Select Field (Dropdown)**
+   - Field Type: `SELECT`
+   - Field Key: `{prefix}{n}_{label}` (custom field)
+   - Location: `features/Mobile/FieldFactory/Select/`
+   - Figma Reference: node-id 327-9887 (>3 options), 327-11029 (≤3 options)
+   - Features:
+     - Adaptive UI based on number of options
+     - **> 3 options**: Native dropdown with Material UI Select
+     - **≤ 3 options**: Button group with rounded buttons (8px radius)
+     - Background: #fadcd8 (empty state)
+     - No border outline (uses box shadow like Status/Privacy)
+     - Box shadow: 0px 1.5px 4px 0px rgba(0,0,0,0.25)
+     - Red arrow dropdown icon (theme.palette.primary[8])
+     - Empty state: 14px font, subtle text
+     - Selected state: 16px font
+     - Height: 40px (dropdown)
+   - Mock Data: `mockSelectOptions` in mockData.ts (4 options: Tyre, Gas, Oil, Brake)
+   - Registry Update: Added to fieldRegistry as `SELECT: SelectField`
+
+9. **Number Field**
+   - Field Type: `DOUBLE`
+   - Field Key: `{prefix}{n}_{label}` (custom field)
+   - Location: `features/Mobile/FieldFactory/Number/`
+   - Figma Reference: node-id 327-11034
+   - Features:
+     - Same styling as Text/Paragraph fields (NOT like Status/Privacy)
+     - Border: 1px solid #eb4236 (2px bottom when focused)
+     - Background: #faf3f3
+     - No box shadow
+     - Red "123" icon on LEFT side (startAdornment)
+     - Custom SVG icon (not Material-UI icon)
+     - Number input type (numeric keyboard on mobile)
+     - No spinner buttons
+     - Height: 40px
+   - Registry Update: Added to fieldRegistry as `DOUBLE: NumberField`
+
+### Showcase Updates
+
+Both new fields added to:
+- **Mobile Fields** showcase (`features/ComponentShowcase/views/MobileField.tsx`)
+- **Mobile Components** showcase (`features/ComponentShowcase/views/MobileComponents.tsx`)
+
+Updated field count: 9 total mobile field components
+
+### Documentation
+
+- Created `MOBILE_FIELDS_CHECKLIST.md` - Comprehensive checklist showing all 9 completed fields with implementation status
+
+---
+
 ## 2025-10-06 - Field Implementation Complete
 
 ### Completed Field Components

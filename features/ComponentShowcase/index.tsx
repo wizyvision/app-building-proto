@@ -18,14 +18,16 @@ import { Section } from './views/Section';
 import { Field } from './views/Field';
 import { FieldLibraryButton } from './views/FieldLibraryButton';
 import { MobileField } from './views/MobileField';
+import { MobileComponents } from './views/MobileComponents';
 
-type ShowcaseView = 'section' | 'field' | 'fieldLibraryButton' | 'mobileField';
+type ShowcaseView = 'section' | 'field' | 'fieldLibraryButton' | 'mobileField' | 'mobileComponents';
 
 const navItems: { label: string; value: ShowcaseView }[] = [
   { label: 'Section', value: 'section' },
   { label: 'Field', value: 'field' },
   { label: 'Field Library Button', value: 'fieldLibraryButton' },
   { label: 'Mobile Fields', value: 'mobileField' },
+  { label: 'Mobile Components', value: 'mobileComponents' },
 ];
 
 /**
@@ -82,6 +84,7 @@ export const ComponentShowcase: React.FC = () => {
     field: <Field />,
     fieldLibraryButton: <FieldLibraryButton />,
     mobileField: <MobileField />,
+    mobileComponents: <MobileComponents />,
   };
 
   const renderContent = () => contentMap[selectedView];

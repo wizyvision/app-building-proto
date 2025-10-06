@@ -215,6 +215,53 @@ export const mockPrivacies: Privacy[] = [
   },
 ];
 
+// SelectOption type definition
+export interface SelectOption {
+  id: string;
+  value: string;
+  intl: {
+    en: string;
+    [key: string]: string;
+  };
+  position: number;
+}
+
+// Mock select options
+export const mockSelectOptions: SelectOption[] = [
+  {
+    id: '1',
+    value: 'Tyre',
+    intl: {
+      en: 'Tyre',
+    },
+    position: 100,
+  },
+  {
+    id: '2',
+    value: 'Gas',
+    intl: {
+      en: 'Gas',
+    },
+    position: 200,
+  },
+  {
+    id: '3',
+    value: 'Oil',
+    intl: {
+      en: 'Oil',
+    },
+    position: 300,
+  },
+  {
+    id: '4',
+    value: 'Brake',
+    intl: {
+      en: 'Brake',
+    },
+    position: 400,
+  },
+];
+
 // Mock field value response
 export const mockFieldValue: FieldValueResponse = {
   id: '68cfe2df-462b-4afd-97fa-0063c41cc29e',

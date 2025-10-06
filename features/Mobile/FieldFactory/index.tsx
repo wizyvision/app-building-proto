@@ -33,6 +33,8 @@ import { ParagraphField } from './Paragraph';
 import { SignatureField } from './Signature';
 import { PrivacyField } from './Privacy';
 import { StatusField } from './Status';
+import { SelectField } from './Select';
+import { NumberField } from './Number';
 import { FieldContainer } from '@/features/Mobile/FieldContainer';
 
 interface MobileFieldProps {
@@ -48,6 +50,8 @@ interface MobileFieldProps {
  * - PRIVACY_ID: Privacy (fieldKey: privacyId)
  * - SIGNATURE: Signature (fieldKey: {prefix}{n}_{label})
  * - STATUS_ID: Status (fieldKey: statusId)
+ * - SELECT: Select (fieldKey: {prefix}{n}_{label})
+ * - DOUBLE: Number (fieldKey: {prefix}{n}_{label})
  */
 export const fieldRegistry: Record<string, React.FC<MobileFieldProps>> = {
   STRING: TextField,
@@ -55,6 +59,8 @@ export const fieldRegistry: Record<string, React.FC<MobileFieldProps>> = {
   PRIVACY_ID: PrivacyField,
   SIGNATURE: SignatureField,
   STATUS_ID: StatusField,
+  SELECT: SelectField,
+  DOUBLE: NumberField,
 };
 
 interface MobileFieldFactoryProps {

@@ -7,7 +7,7 @@ import { MobileFieldFactory } from '@/features/Mobile/FieldFactory';
 /**
  * Mobile Field Components Showcase
  *
- * Displays all 7 mobile-optimized field components with FieldContainer wrapping
+ * Displays all 9 mobile-optimized field components with FieldContainer wrapping
  */
 export const MobileField: React.FC = () => {
   return (
@@ -141,6 +141,44 @@ export const MobileField: React.FC = () => {
             fieldKey: 'f3_signature',
             label: 'Signature Field',
             description: 'Sign here using your finger or stylus'
+          }}
+          showActions={true}
+          hasMedia={true}
+          hasRemarks={true}
+          hasActions={true}
+        />
+      </Box>
+
+      {/* Select Field (Dropdown) */}
+      <Box>
+        <Typography variant="caption" display="block" gutterBottom>
+          Field Type: SELECT | Field Key: {'{prefix}{n}_{label}'} (custom field)
+        </Typography>
+        <MobileFieldFactory
+          field={{
+            dataType: 'SELECT',
+            fieldKey: 'c15_dropdown',
+            label: 'Dropdown Field',
+            description: 'Select an option from the dropdown'
+          }}
+          showActions={true}
+          hasMedia={true}
+          hasRemarks={true}
+          hasActions={true}
+        />
+      </Box>
+
+      {/* Number Field */}
+      <Box>
+        <Typography variant="caption" display="block" gutterBottom>
+          Field Type: DOUBLE | Field Key: {'{prefix}{n}_{label}'} (custom field)
+        </Typography>
+        <MobileFieldFactory
+          field={{
+            dataType: 'DOUBLE',
+            fieldKey: 'c15_number',
+            label: 'Number Field',
+            description: 'Enter a numeric value'
           }}
           showActions={true}
           hasMedia={true}
