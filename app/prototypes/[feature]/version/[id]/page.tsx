@@ -1,7 +1,9 @@
 'use client';
 
+import React from 'react';
 import { useParams } from 'next/navigation';
 import { notFound } from 'next/navigation';
+import { Box, styled } from '@mui/material';
 import FormBuilderV1 from '@/features/FormBuilder/version1';
 import FormBuilderV2 from '@/features/FormBuilder/version2';
 
@@ -43,6 +45,18 @@ import FormBuilderV2 from '@/features/FormBuilder/version2';
  * - Jakob's Law: Consistent routing pattern across all features
  */
 
+// Styled components
+const PageContainer = styled(Box)(({ theme }) => ({
+  width: '100%',
+  minHeight: '100vh',
+  backgroundColor: theme.palette.background.default,
+}));
+
+const ViewContainer = styled(Box)(() => ({
+  height: '100%',
+  overflow: 'auto',
+}));
+
 // Feature + Version registry: Maps feature slugs to their version components
 const featureRegistry: Record<string, Record<string, React.ComponentType<{ featureName: string; versionId: string }>>> = {
   'form-builder': {
@@ -79,5 +93,11 @@ export default function PrototypeVersionPage() {
   }
 
   // Render the version-specific component
-  return <VersionComponent featureName={featureName} versionId={versionId} />;
+  return (
+    <PageContainer>
+      <ViewContainer>
+        <VersionComponent featureName={featureName} versionId={versionId} />
+      </ViewContainer>
+    </PageContainer>
+  );
 }
