@@ -48,6 +48,7 @@ export const Field = ({
   label,
   type,
   isSystemField = false,
+  sectionId,
   fieldData,
   onLabelChange,
   onEdit,
@@ -70,12 +71,15 @@ export const Field = ({
     id,
     data: {
       type: 'field',
+      sectionId,
     },
   });
 
+  // FIX: Disable transition during active drag for immediate response
+  // This eliminates the slow transition delay on drag start
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: isDragging ? undefined : transition,
   };
 
   useEffect(() => {

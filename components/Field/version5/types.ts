@@ -5,6 +5,7 @@ export interface AdminFieldProps {
   label: string;
   type: string;
   isSystemField?: boolean;
+  sectionId?: string;
   fieldData?: FieldData;
   onLabelChange?: (newLabel: string) => void;
   onEdit?: () => void;

@@ -182,6 +182,108 @@ export const formBuilderVersions: Record<string, VersionMetadata> = {
       result: 'Result: From concept validation to production-ready implementation',
     },
   },
+
+  v3: {
+    // Basic Info
+    id: 'v3',
+    version: '3.0',
+    title: 'Form Builder v3.0: Insertion Pattern',
+    date: '2025-10-07',
+    badgeVariant: 'latest',
+    badgeLabel: 'Latest',
+
+    // Case Study Content
+    purpose: 'Implement context-aware field/section insertion using a non-invasive overlay pattern that provides progressive disclosure without modifying existing components.',
+
+    problemStatement: 'How to add fields and sections at specific positions without persistent UI elements, while maintaining discoverability and reducing visual clutter.',
+
+    solution: '<strong>Insertion Overlay Pattern:</strong> Context-aware hover/tap zones between components that reveal appropriate action buttons. Non-invasive overlay system sits between existing components without modifying them.',
+
+    keyFeatures: [
+      'Context-aware insertion zones that appear on hover/tap',
+      'Progressive disclosure - buttons only shown when needed',
+      'Different actions based on position (between fields, section end, etc.)',
+      'Non-invasive overlay - no modification to existing components',
+      'Mobile preview panel on right side (like v2)',
+      'Zero layout shifts - absolute positioning prevents reflow',
+    ],
+
+    strengths: [
+      'Minimal visual clutter - clean interface until hover',
+      'Context-aware - shows only relevant actions per position',
+      'More screen space - no persistent field library',
+      'Lower learning curve than v2 - familiar hover patterns',
+      'No component modifications - clean separation of concerns',
+      'Predictable insertion - new items appear exactly where indicated',
+    ],
+
+    weaknesses: [
+      'Less field type discovery than v2 (types hidden until click)',
+      'Requires hover capability for optimal experience',
+      'May be less discoverable for first-time users',
+      'Touch experience requires tap-to-reveal adaptation',
+    ],
+
+    designDecisions: "After v2's success with the persistent library, we explored reducing visual complexity while maintaining efficiency. The insertion pattern provides context-aware actions without permanent UI elements, using progressive disclosure principles.",
+
+    learnings: [
+      'Progressive disclosure can reduce cognitive load significantly',
+      'Context-aware UI adapts better to user intent',
+      'Hover zones provide good balance of discoverability and cleanliness',
+      'Non-invasive patterns preserve component independence',
+      'Touch adaptations essential for tablet experiences',
+    ],
+
+    nextSteps: 'Test with users to validate discoverability. Consider hybrid approach combining v2 drag-from-library with v3 insertion zones. Explore AI-powered field suggestions based on context.',
+
+    // Additional Metadata
+    bestScenarios: [
+      'Forms with moderate complexity (10-20 fields)',
+      'Users who prefer clean, minimal interfaces',
+      'Desktop-first workflows with hover capability',
+      'Applications prioritizing screen real estate',
+      'Iterative form building with frequent position adjustments',
+    ],
+
+    userExpertise: [
+      'Suitable for beginners to intermediate users',
+      'Benefits from understanding of hover interactions',
+      'Lower learning curve than drag-and-drop (v2)',
+      'Familiar patterns from text editors and design tools',
+    ],
+
+    designPrinciples: [
+      'Progressive Disclosure: Show only what\'s needed, when it\'s needed',
+      'Fitts\'s Law: Full-width hover zones, 44px minimum height',
+      'Hick\'s Law: Maximum 2 actions per zone to reduce choices',
+      'Jakob\'s Law: Familiar hover-to-reveal pattern from editors',
+      'Visual Hierarchy: Buttons styled by importance (primary/secondary)',
+      'Miller\'s Law: Sections still chunk fields into groups',
+      'Aesthetic-Usability: Clean interface until interaction',
+    ],
+
+    technicalFeasibility: {
+      developmentTime: '2-3 weeks',
+      complexity: 'Medium',
+      maintainability: 'High',
+    },
+
+    // Comparison with previous version
+    comparison: {
+      previousVersion: 'v2.0',
+      changes: [
+        'Replaced persistent field library with insertion zones',
+        'Added context-aware action buttons',
+        'Implemented hover/tap zone detection',
+        'Reduced from 2 sidebars to 1 (mobile preview only)',
+        'Progressive disclosure instead of always-visible UI',
+        'Non-invasive overlay preserves component independence',
+      ],
+      beforeMetric: 'v2.0: 280px field library sidebar always visible',
+      afterMetric: 'v3.0: Zero persistent UI, context-aware zones',
+      result: 'Result: 280px more horizontal space, cleaner interface with smart interactions',
+    },
+  },
 };
 
 // Helper function to get version by ID

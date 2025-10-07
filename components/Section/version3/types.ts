@@ -6,6 +6,7 @@ export interface SectionProps {
   isExpanded: boolean;
   fieldCount?: number;
   isSystem?: boolean;
+  isAnySectionDragging?: boolean;
   onToggle: () => void;
   onRename: (newName: string) => void;
   onDelete?: () => void;
@@ -33,6 +34,7 @@ export interface SectionContentProps {
   isFieldDragging?: boolean;
   sectionId?: string;
   children?: ReactNode;
-  onAddField: () => void;
   hasFields?: boolean;
+  onAddField?: () => void;
+  onAddSection?: () => void; // For adding section after this section
 }

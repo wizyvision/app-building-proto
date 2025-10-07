@@ -2,14 +2,16 @@
 
 import React from 'react';
 import { Collapse } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import { useDroppable } from '@dnd-kit/core';
 import { SectionContentProps } from './types';
 import {
   ContentContainer,
   ContentInner,
-  AddFieldButton,
-  AddFieldIcon,
   EmptyState,
+  EmptyStateLink,
+  EmptyStateText,
+  AddFieldButton,
 } from './styles';
 
 /**
@@ -35,8 +37,9 @@ export const SectionContent: React.FC<SectionContentProps> = ({
   isFieldDragging = false,
   sectionId,
   children,
-  onAddField,
   hasFields = false,
+  onAddField,
+  onAddSection,
 }) => {
   const shouldCollapse = isSectionDragging || isAnySectionDragging;
 
@@ -49,10 +52,24 @@ export const SectionContent: React.FC<SectionContentProps> = ({
     },
   });
 
+  // When any section is dragging, hide content completely (show only header)
+  if (shouldCollapse) {
+    return null;
+  }
+
   return (
-    <Collapse in={isExpanded && !shouldCollapse} timeout={shouldCollapse ? 0 : "auto"} unmountOnExit>
+    <Collapse
+      in={isExpanded}
+      timeout={shouldCollapse ? 0 : "auto"}
+      unmountOnExit
+      sx={{
+        padding: 0,
+        '& .MuiCollapse-wrapper': { padding: 0 },
+        '& .MuiCollapse-wrapperInner': { padding: 0 },
+      }}
+    >
       <ContentContainer>
-        <ContentInner padding={1.5}>
+        <ContentInner>
           {/* Empty State or Fields */}
           {!hasFields ? (
             <EmptyState
@@ -60,7 +77,21 @@ export const SectionContent: React.FC<SectionContentProps> = ({
               isFieldDragging={isFieldDragging}
               isEmptyOver={isEmptyOver}
             >
-              {isFieldDragging ? 'Drop field here' : 'Add or Drag Fields here'}
+              {isFieldDragging ? (
+                'Drop field here'
+              ) : (
+                onAddField ? (
+                  <>
+                    <EmptyStateLink onClick={onAddField} aria-label="Add field to section">
+                      Add
+                    </EmptyStateLink>
+                    {' '}
+                    <EmptyStateText>or drag fields</EmptyStateText>
+                  </>
+                ) : (
+                  'Add or drag fields'
+                )
+              )}
             </EmptyState>
           ) : (
             children

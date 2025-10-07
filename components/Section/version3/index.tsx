@@ -90,6 +90,7 @@ export const Section: React.FC<SectionProps> = ({
   isExpanded,
   fieldCount = 0,
   isSystem = false,
+  isAnySectionDragging = false,
   onToggle,
   onRename,
   onDelete,
@@ -104,20 +105,33 @@ export const Section: React.FC<SectionProps> = ({
     },
   });
 
+  // FIX: Collapsed sections should ONLY accept field drops, NOT section drops
+  // When dragging a section, collapsed sections should not show drop indicators
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({
     id: `section-drop-${id}`,
     data: {
-      type: 'section-drop',
+      type: 'section-drop', // This is for FIELD drops into collapsed sections
       sectionId: id,
-    }
+    },
+    disabled: isAnySectionDragging, // Disable when dragging sections (only accept fields)
   });
 
+  // FIX: Disable transition during active drag for immediate response
+  // This eliminates the slow transition delay on drag start
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
+    transition: isDragging ? undefined : transition,
+    // FIX: Hide the original position when dragging (DragOverlay shows the preview)
+    opacity: isDragging ? 0 : 1,
+    zIndex: isDragging ? 9999 : 1, // Highest z-index when dragging, default 1 for proper stacking
     position: 'relative' as const, // For absolutely positioned drag handle
   };
+
+  // Collapse section content when any section is being dragged
+  const shouldCollapse = isAnySectionDragging;
+
+  // Force section to collapse instantly when dragging
+  const effectiveIsExpanded = shouldCollapse ? false : isExpanded;
 
   return (
     <SectionWrapper
@@ -129,7 +143,7 @@ export const Section: React.FC<SectionProps> = ({
       <SectionCard>
         <SectionHeader
           name={name}
-          isExpanded={isExpanded}
+          isExpanded={effectiveIsExpanded}
           fieldCount={fieldCount}
           isSystem={isSystem}
           isHovered={isHovered}
@@ -142,12 +156,14 @@ export const Section: React.FC<SectionProps> = ({
         />
         {React.isValidElement(children)
           ? React.cloneElement(children as React.ReactElement<any>, {
-              isSectionDragging: isDragging
+              isExpanded: effectiveIsExpanded,
+              isSectionDragging: isDragging,
+              isAnySectionDragging: shouldCollapse
             })
           : children
         }
-        {!isExpanded && (
-          <CollapsedDropZone ref={setDroppableRef} isOver={isOver} />
+        {!effectiveIsExpanded && (
+          <CollapsedDropZone ref={setDroppableRef} isOver={isOver && !isAnySectionDragging} />
         )}
       </SectionCard>
     </SectionWrapper>

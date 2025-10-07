@@ -51,7 +51,9 @@ export const HeaderLeft = styled(Box)({
   minWidth: 0, // Allow text to truncate
 });
 
-export const ToggleButton = styled(IconButton)(({ expanded }: { expanded: boolean }) => ({
+export const ToggleButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== 'expanded',
+})<{ expanded: boolean }>(({ expanded }) => ({
   padding: 0,
   width: '24px',
   height: '24px',

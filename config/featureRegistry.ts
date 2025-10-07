@@ -48,6 +48,13 @@ export const featureRegistry: Record<string, FeatureMetadata> = {
         version: '2.0',
         date: '2024-10-01',
         description: 'Full Implementation - Production-ready with field library, drag-and-drop, and device preview',
+        isLatest: false,
+      },
+      {
+        id: 'v3',
+        version: '3.0',
+        date: '2025-10-07',
+        description: 'Insertion Pattern - Non-invasive overlay system for context-aware field/section insertion with mobile preview',
         isLatest: true,
       },
     ],

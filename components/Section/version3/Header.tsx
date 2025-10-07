@@ -118,7 +118,10 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
         <ExpandButton
           size="small"
           aria-label={isExpanded ? 'Collapse section' : 'Expand section'}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
         >
           {isExpanded ? <ExpandIcon /> : <CollapseIcon />}
         </ExpandButton>

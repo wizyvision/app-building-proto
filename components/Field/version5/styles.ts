@@ -13,8 +13,7 @@ export const AdminFieldContainer = styled(Box, {
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  paddingBottom: theme.spacing(1), // 8px
-  paddingTop: 0,
+  padding: 0, // No padding
   paddingLeft: theme.spacing(1), // 8px
   paddingRight: theme.spacing(1), // 8px
   width: '100%',

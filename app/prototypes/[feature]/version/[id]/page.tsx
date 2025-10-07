@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { Box, styled } from '@mui/material';
 import FormBuilderV1 from '@/features/FormBuilder/version1';
 import FormBuilderV2 from '@/features/FormBuilder/version2';
+import FormBuilderV3 from '@/features/FormBuilder/version3';
 
 /**
  * Prototype Version Router
@@ -62,7 +63,7 @@ const featureRegistry: Record<string, Record<string, React.ComponentType<{ featu
   'form-builder': {
     v1: FormBuilderV1,
     v2: FormBuilderV2,
-    // v3: FormBuilderV3, // Add future versions here
+    v3: FormBuilderV3,
   },
   // 'user-management': {
   //   v1: UserManagementV1,

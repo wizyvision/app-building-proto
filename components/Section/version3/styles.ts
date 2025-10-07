@@ -81,8 +81,6 @@ export const DragIconContainer = styled(Box)({
 // Jakob's Law: Familiar expand/collapse icon button
 // Fitts's Law: 44x44px minimum touch target
 export const ExpandButton = styled(IconButton)(({ theme }) => ({
-  minWidth: theme.spacing(5.5), // 44px
-  minHeight: theme.spacing(5.5), // 44px
   padding: theme.spacing(1),
   transition: theme.transitions.create(['background-color', 'transform'], {
     duration: theme.transitions.duration.short,
@@ -191,7 +189,7 @@ export const StyledDeleteIcon = styled(DeleteIcon)({
 
 // Progressive Disclosure: Content only shown when expanded
 export const ContentContainer = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(0),
+  padding: 0,
   backgroundColor: '#f8f8f8', // Figma spec: #f8f8f8 background for content area
 }));
 
@@ -199,14 +197,15 @@ export const ContentInner = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-  gap: theme.spacing(1),
+  gap: 0, // No gap - insertion zones have padding for spacing
+  padding: theme.spacing(1, 2), // 8px top/bottom, 16px left/right padding
 }));
 
 // Miller's Law: Group fields in manageable chunks (5-7 visible at once)
 export const FieldsList = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  gap: theme.spacing(1.75), // ~14px
+  gap: theme.spacing(0), // ~14px
 }));
 
 // Visual Hierarchy: Outlined style = secondary action
@@ -259,6 +258,54 @@ export const EmptyState = styled(Box, {
   borderColor: isEmptyOver ? theme.palette.primary.main : theme.palette.grey[300],
   minHeight: isFieldDragging ? theme.spacing(10) : 'auto',
   transition: theme.transitions.create(['background-color', 'border-color', 'min-height'], {
+    duration: theme.transitions.duration.shorter,
+  }),
+}));
+
+// Empty state text for gray text portion ("or drag fields")
+export const EmptyStateText = styled('span')(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  fontSize: theme.typography.body2.fontSize,
+  fontStyle: 'italic',
+  marginLeft: '4px',
+}));
+
+// Empty state clickable link for "Add" text
+// UX PRINCIPLES:
+// - Fitts's Law: Minimum touch target with padding
+// - Visual Hierarchy: Primary color indicates interactivity
+// - Aesthetic-Usability: Hover underline provides clear affordance
+export const EmptyStateLink = styled('button')(({ theme }) => ({
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  margin: 0,
+  color: theme.palette.primary.main,
+  fontSize: theme.typography.body2.fontSize,
+  fontStyle: 'italic',
+  cursor: 'pointer',
+  textDecoration: 'none',
+  fontFamily: 'inherit',
+  display: 'inline',
+
+  // Hover state
+  '&:hover': {
+    textDecoration: 'underline',
+  },
+
+  // Active state
+  '&:active': {
+    color: theme.palette.primary.dark,
+  },
+
+  // Focus state for accessibility
+  '&:focus-visible': {
+    outline: `2px solid ${theme.palette.primary.main}`,
+    outlineOffset: 2,
+    borderRadius: theme.spacing(0.25),
+  },
+
+  transition: theme.transitions.create(['color'], {
     duration: theme.transitions.duration.shorter,
   }),
 }));

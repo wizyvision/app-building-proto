@@ -4,6 +4,72 @@
 
 ---
 
+## 📝 CHANGELOG
+
+### FormBuilder Version 3 - 2025-10-07
+
+**Major Changes:**
+- **Inline Insertion Zones**: Replaced dashed button-based insertion with subtle hover-based inline insertion zones
+  - Compact popover menu appears on hover (no layout shifts)
+  - Context-aware: Shows "Field" only between fields, "Field + Section" between sections
+  - Uses `InlineInsertionZone` component throughout
+  - Disabled legacy `InsertionOverlay` component
+
+- **Standalone Fields Support**: Fields can now exist outside of sections
+  - Data structure changed from `sections[]` to `items[]` (union of Section | Field)
+  - Standalone fields render at full width in mobile preview (no section wrapper)
+  - Standalone fields match section width in desktop builder
+  - Created `FormItem` union type for type-safe handling
+
+- **Empty Section State**: Improved UX for empty sections
+  - Shows "Add or drag fields" message
+  - "Add" is clickable link (primary color with hover underline)
+  - 4px margin between "Add" and "or drag fields" for better readability
+  - Drop zone active when dragging fields
+
+- **Insertion Zone Improvements**:
+  - Added insertion zone after last field in each section (Field + Section options)
+  - Added insertion zone after last section/item in form
+  - All insertion zones properly positioned (no zones at wrong locations)
+  - Minimal vertical space (1px line + 8px margins = ~10px total)
+  - Section insertion correctly inserts at specified position (not at end)
+
+- **Touch Target Override**: Changed from 44x44px mobile standard to 24x24px for web
+  - Icon buttons: 24x24px (compact web sizing)
+  - Applies to all insertion zone buttons
+  - Note: Mobile-specific components may still use 44x44px
+
+- **Drag-and-Drop Section Collapse**: Enhanced section drag-and-drop behavior to match v1/v2
+  - All sections collapse to header-only view during section drag operations
+  - Original dragged section position hidden (opacity: 0) while DragOverlay shows preview
+  - Drop indicators positioned consistently based on drag direction (above when dragging down, below when dragging up)
+  - Drop indicators maintain 10px height (matching insertion zone spacing) with 3px red line
+  - Insertion zones hidden during drag to reduce visual clutter
+  - Immediate collapse with no animation delay for responsive feel
+
+**Files Modified:**
+- `features/FormBuilder/version3/FormBuilder.tsx` - Disabled InsertionOverlay, refactored state to items[]
+- `features/FormBuilder/version3/SectionList.tsx` - Added insertion zone after last item, implemented v2-style drop indicator logic
+- `features/FormBuilder/version3/FieldList.tsx` - Added insertion zone after last field (both buttons)
+- `features/FormBuilder/version3/InlineInsertionZone.tsx` - Compact popover design
+- `features/FormBuilder/version3/InsertionOverlay.tsx` - Removed section-end zones
+- `features/FormBuilder/version3/MobilePreview.tsx` - Renders standalone fields at full width
+- `features/FormBuilder/version3/DropIndicator.tsx` - Updated to maintain 10px height with 3px centered line
+- `features/FormBuilder/version3/types.ts` - Added FormItem union type
+- `features/FormBuilder/version3/styles.ts` - Added compact zone styling
+- `components/Section/version3/Content.tsx` - Empty state with clickable "Add" link, immediate return null during drag
+- `components/Section/version3/index.tsx` - Added opacity: 0 for dragged section, effectiveIsExpanded logic
+- `components/Section/version3/styles.ts` - EmptyStateLink and EmptyStateText styling with 4px margin
+
+**Breaking Changes:**
+- None (backward compatible, data structure conversion handled internally)
+
+**Known Issues:**
+- Drag-drop for standalone fields not yet implemented (fields can't be reordered via drag)
+- FieldData type conflict between FormBuilder and Field component (pre-existing)
+
+---
+
 ## 📋 PROTOTYPE STRUCTURE (MANDATORY)
 
 ### Route Hierarchy
