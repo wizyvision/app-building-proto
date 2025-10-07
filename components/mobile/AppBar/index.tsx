@@ -1,6 +1,6 @@
 import React from 'react';
 import { MobileAppBarProps } from './types';
-import { AppBarContainer, AppBarButton } from './styles';
+import { AppBarContainer, AppBarButton, AppBarSpacer } from './styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
@@ -42,7 +42,7 @@ export const MobileAppBar: React.FC<MobileAppBarProps> = ({
           <ArrowBackIcon />
         </AppBarButton>
       ) : (
-        <div style={{ width: '48px' }} /> // Spacer
+        <AppBarSpacer />
       )}
 
       {showMenuButton ? (
@@ -50,7 +50,7 @@ export const MobileAppBar: React.FC<MobileAppBarProps> = ({
           <MoreVertIcon />
         </AppBarButton>
       ) : (
-        <div style={{ width: '48px' }} /> // Spacer
+        <AppBarSpacer />
       )}
     </AppBarContainer>
   );

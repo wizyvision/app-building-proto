@@ -6,10 +6,13 @@ import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-ki
 import { Box } from '@mui/material';
 import { Section as SectionV1 } from '@/components/Section/version1';
 import { Section as SectionV2 } from '@/components/Section/version2';
+import { Section as SectionV3 } from '@/components/Section/version3';
 import { SectionContent as SectionContentV1 } from '@/components/Section/version1/Content';
 import { SectionContent as SectionContentV2 } from '@/components/Section/version2/Content';
+import { SectionContent as SectionContentV3 } from '@/components/Section/version3/Content';
 import { Field as FieldV1 } from '@/components/Field/version1';
 import { Field as FieldV2 } from '@/components/Field/version2';
+import { Field as FieldV5 } from '@/components/Field/version5';
 import { FieldProps } from '@/components/Field';
 import { DragOverlayContainer } from '@/components/Field/version2/styles';
 import { VersionTabs } from '@/components/shared/VersionTabs';
@@ -87,10 +90,23 @@ const SECTION_VERSIONS = [
       'Updated visual consistency with Figma design',
     ],
   },
+  {
+    version: 3,
+    date: 'October 7, 2025',
+    description: '72px header with TextField click-to-focus, System badge, and absolute drag handle',
+    features: [
+      'Header height increased to 72px (from 64px)',
+      'TextField always editable (click to focus, no edit mode)',
+      'System badge with cyan/teal background on right side',
+      'Drag handle absolutely positioned (appears on hover)',
+      'Hover background: #f0f0f0 (from Field v5 pattern)',
+      'Same expand/collapse behavior as v1/v2',
+    ],
+  },
 ];
 
 export const Section: React.FC = () => {
-  const [currentVersion, setCurrentVersion] = useState(1);
+  const [currentVersion, setCurrentVersion] = useState(3);
   const [isDraggingSection, setIsDraggingSection] = useState(false);
   const [isDraggingField, setIsDraggingField] = useState(false);
   const [activeField, setActiveField] = useState<MockField | null>(null);
@@ -336,9 +352,9 @@ export const Section: React.FC = () => {
   const versionData = SECTION_VERSIONS.find((v) => v.version === currentVersion);
 
   // Select component based on version
-  const SectionComponent = currentVersion === 1 ? SectionV1 : SectionV2;
-  const SectionContent = currentVersion === 1 ? SectionContentV1 : SectionContentV2;
-  const Field = currentVersion === 1 ? FieldV1 : FieldV2;
+  const SectionComponent = currentVersion === 1 ? SectionV1 : currentVersion === 2 ? SectionV2 : SectionV3;
+  const SectionContent = currentVersion === 1 ? SectionContentV1 : currentVersion === 2 ? SectionContentV2 : SectionContentV3;
+  const Field = currentVersion === 1 ? FieldV1 : currentVersion === 2 ? FieldV2 : FieldV5;
 
   // Custom collision detection: prioritize field drop zones over sections
   const customCollisionDetection = (args: any) => {
@@ -452,16 +468,10 @@ export const Section: React.FC = () => {
                           {/* Show drop indicator above this field */}
                           {showIndicatorAbove && <DropIndicatorBox />}
                           <Field
-                          onEditLabel={function (newLabel: string): void {
-                            throw new Error('Function not implemented.');
-                          } } onMenuOpen={function (event: React.MouseEvent<HTMLButtonElement>): void {
-                            throw new Error('Function not implemented.');
-                          } } {...field}
-                          sectionId={section.id}
-                          onLabelChange={(newLabel: string) => handleFieldEditLabel(section.id, field.id, newLabel)}
-                          onEdit={() => handleFieldEdit(section.id, field.id)}                            // onMenuClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>
-                            //   handleFieldMenuOpen(section.id, field.id, event)
-                            // }
+                            {...field}
+                            onLabelChange={(newLabel: string) => handleFieldEditLabel(section.id, field.id, newLabel)}
+                            onEdit={() => handleFieldEdit(section.id, field.id)}
+                            onMenuClick={() => console.log('Menu clicked for field:', field.id)}
                           />
                           {/* Show drop indicator below this field */}
                           {showIndicatorBelow && <DropIndicatorBoxBelow />}
@@ -480,16 +490,10 @@ export const Section: React.FC = () => {
           {activeField ? (
             <DragOverlayContainer>
               <Field
-                  onEditLabel={function (newLabel: string): void {
-                    throw new Error('Function not implemented.');
-                  } }
-                  onMenuOpen={function (event: React.MouseEvent<HTMLButtonElement>): void {
-                    throw new Error('Function not implemented.');
-                  } } {...activeField}
-                  sectionId=""
-                  onLabelChange={() => { } }
-                  onEdit={() => { } }
-                  onMenuClick={() => { } }
+                {...activeField}
+                onLabelChange={() => {}}
+                onEdit={() => {}}
+                onMenuClick={() => {}}
               />
             </DragOverlayContainer>
           ) : null}

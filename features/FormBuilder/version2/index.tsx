@@ -22,6 +22,7 @@ import { FieldDrawer } from '@/components/FieldDrawer/FieldDrawer';
 import { Divider } from '@/components/FieldLibraryButton/version1';
 import { PreviewToggle } from '@/components/PreviewToggle/version1';
 import { DraggableFieldLibraryButton } from './DraggableFieldLibraryButton';
+import { MobileFormPreview } from './MobileFormPreview';
 import { Section } from '@/components/Section/version2';
 import { SectionContent } from '@/components/Section/version2/Content';
 import { Field } from '@/components/Field/version2';
@@ -37,12 +38,20 @@ import FolderIcon from '@mui/icons-material/Folder';
  * VERSION INFO:
  * - Version: 2
  * - Layout: Three-column (field library drawer + center content)
- * - Components: Section v2, Field v2, FieldLibraryDrawer
+ * - Components: Section v2, Field v2, FieldLibraryDrawer, MobileFormPreview
+ * - Features: Web and Mobile preview toggle
  *
  * UX PRINCIPLES APPLIED:
- * - Jakob's Law: Three-panel layout familiar from design tools
- * - Fitts's Law: Fixed sidebar keeps tools in consistent location
- * - Visual Hierarchy: Clear separation between library, preview, and form
+ * - Jakob's Law: Three-panel layout familiar from design tools, mobile device preview familiar from responsive design tools
+ * - Fitts's Law: Fixed sidebar keeps tools in consistent location, preview toggle in easy-reach position
+ * - Visual Hierarchy: Clear separation between library, preview, and form. Mobile preview visually distinct with device frame
+ * - Hick's Law: Simple toggle between web/mobile reduces decision time
+ *
+ * INTEGRATION:
+ * - Mobile preview uses MobileDevice component with MobileFieldFactory
+ * - Web preview shows drag-and-drop form builder with Section v2 and Field v2
+ * - Toggle preserves form state when switching between views
+ * - Mobile preview is read-only (no editing), web preview is fully interactive
  */
 
 interface FormBuilderV2Props {
@@ -727,8 +736,18 @@ export default function FormBuilderV2({ featureName, versionId }: FormBuilderV2P
               <PreviewToggle value={previewMode} onChange={setPreviewMode} />
             </PreviewToggleContainer>
 
-            <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
-              <SectionsContainer>
+            {/* Mobile Preview */}
+            {previewMode === 'mobile' && (
+              <MobileFormPreview
+                sections={sections}
+                standaloneFields={standaloneFields}
+              />
+            )}
+
+            {/* Web Preview (Form Builder) */}
+            {previewMode === 'web' && (
+              <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                <SectionsContainer>
                 {sections.map((section, index) => {
                   const isSectionActive = section.id === activeId;
                   const isSectionOver = section.id === overId;
@@ -839,6 +858,7 @@ export default function FormBuilderV2({ featureName, versionId }: FormBuilderV2P
                 </SectionEndDropZone>
               </SectionsContainer>
             </SortableContext>
+            )}
           </CenterContent>
         </LayoutContainer>
 

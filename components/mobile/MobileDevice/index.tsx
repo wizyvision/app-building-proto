@@ -13,6 +13,7 @@ import {
   BackTriangle,
   HomeCircle,
   RecentAppsSquare,
+  StatusIcon,
 } from './styles';
 import WifiIcon from '@mui/icons-material/Wifi';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
@@ -64,9 +65,9 @@ export const MobileDevice: React.FC<MobileDeviceProps> = ({
             {statusBarTime}
           </StatusBarLeft>
           <StatusBarRight>
-            {showWifi && <WifiIcon sx={{ fontSize: 16 }} />}
-            {showSignal && <SignalCellularAltIcon sx={{ fontSize: 16 }} />}
-            {showBattery && <BatteryFullIcon sx={{ fontSize: 16 }} />}
+            {showWifi && <WifiIcon component={StatusIcon} />}
+            {showSignal && <SignalCellularAltIcon component={StatusIcon} />}
+            {showBattery && <BatteryFullIcon component={StatusIcon} />}
           </StatusBarRight>
         </StatusBar>
 

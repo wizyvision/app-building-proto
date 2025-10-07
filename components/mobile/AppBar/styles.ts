@@ -33,3 +33,9 @@ export const AppBarButton = styled(IconButton)({
     backgroundColor: 'rgba(0, 0, 0, 0.04)',
   },
 });
+
+// Spacer for maintaining layout when buttons are hidden
+export const AppBarSpacer = styled(Box)({
+  width: '48px',
+  height: '48px',
+});

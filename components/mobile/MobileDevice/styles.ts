@@ -120,3 +120,10 @@ export const RecentAppsSquare = styled(Box)({
   border: '2px solid #5f6368',
   borderRadius: '2px',
 });
+
+// Styled icons for status bar - proper WizyVision compliance
+export const StatusIcon = styled('svg')({
+  fontSize: '16px',
+  width: '16px',
+  height: '16px',
+});
