@@ -10,7 +10,7 @@
  */
 
 import { styled } from '@mui/material/styles';
-import { Box, Button, IconButton, Paper } from '@mui/material';
+import { Box, Button, IconButton, Paper, Typography } from '@mui/material';
 
 /**
  * Form Builder Container
@@ -894,4 +894,63 @@ export const DragOverlayFieldType = styled('span')(({ theme }) => ({
   fontWeight: 400,
   color: theme.palette.text.secondary, // Gray
   textTransform: 'uppercase',
+}));
+
+/**
+ * ===================================
+ * MOBILE PREVIEW EMPTY STATE
+ * ===================================
+ * Empty state shown in mobile preview when no form items exist.
+ *
+ * UX PRINCIPLES:
+ * - Jakob's Law: Familiar empty state pattern (centered message, clear instructions)
+ * - Visual Hierarchy: Primary message (larger) followed by secondary instruction (smaller, muted)
+ * - Clarity Trumps Consistency: Clear guidance on what action to take
+ * - Aesthetic-Usability: Generous padding creates calm, approachable empty state
+ */
+
+/**
+ * MobilePreviewEmptyState
+ * Container for mobile preview empty state
+ *
+ * UX PRINCIPLES:
+ * - Visual Hierarchy: Centered layout draws focus to message
+ * - Fitts's Law: Generous padding (48px vertical) creates comfortable reading space
+ * - Aesthetic-Usability: Balanced, calm appearance reduces user anxiety
+ */
+export const MobilePreviewEmptyState = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(6, 2), // 48px vertical, 16px horizontal
+  textAlign: 'center',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: theme.spacing(1), // 8px between messages
+}));
+
+/**
+ * EmptyStatePrimaryText
+ * Main empty state message (larger, more prominent)
+ *
+ * UX PRINCIPLES:
+ * - Visual Hierarchy: Larger font size, primary emphasis
+ * - Typography: body1 (16px) for readability
+ * - Color: text.secondary for less aggressive tone
+ */
+export const EmptyStatePrimaryText = styled(Typography)(({ theme }) => ({
+  // Typography component handles variant internally
+  color: theme.palette.text.secondary,
+}));
+
+/**
+ * EmptyStateSecondaryText
+ * Secondary instructional message (smaller, muted)
+ *
+ * UX PRINCIPLES:
+ * - Visual Hierarchy: Smaller, muted text for supporting information
+ * - Typography: body2 (14px) for secondary content
+ * - Color: text.disabled for clear hierarchy
+ */
+export const EmptyStateSecondaryText = styled(Typography)(({ theme }) => ({
+  // Typography component handles variant internally
+  color: theme.palette.text.disabled,
 }));

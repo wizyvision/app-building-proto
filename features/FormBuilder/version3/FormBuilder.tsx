@@ -96,7 +96,9 @@ import ViewStreamIcon from '@mui/icons-material/ViewStream';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import { SectionList } from './SectionList';
 import { MobilePreview } from './MobilePreview';
+import { FieldConfiguration } from '@/features/FieldConfiguration';
 import { FormBuilderProps, SectionData, FieldData, InsertionPosition, FormItem } from './types';
+import { FormBuilderProvider } from './context/FormBuilderContext';
 import {
   FormBuilderContainer,
   MainContent,
@@ -120,17 +122,21 @@ const defaultSections: SectionData[] = [
     fields: [
       {
         id: 'field-status',
+        key: 'status',
         label: 'Status',
         type: DataTypes.STATUS_ID,
         isRequired: true,
         isSystemField: true,
+        dataTypeLocked: true,
       },
       {
         id: 'field-date',
+        key: 'createdAt',
         label: 'Date',
         type: DataTypes.DATE,
         isRequired: true,
         isSystemField: true,
+        dataTypeLocked: true,
       },
     ],
     order: 0,
@@ -143,6 +149,7 @@ const defaultSections: SectionData[] = [
     fields: [
       {
         id: 'field-pressure-reading',
+        key: 'c1_pressurereading',
         label: 'Pressure/Meter Reading (PSI)',
         type: DataTypes.DOUBLE,
         isRequired: false,
@@ -150,6 +157,7 @@ const defaultSections: SectionData[] = [
       },
       {
         id: 'field-photo-current-state',
+        key: 'c2_photocurrentstate',
         label: 'Photo - Current State',
         type: DataTypes.FILES,
         isRequired: false,
@@ -185,7 +193,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
     const newField: FieldData = {
       id: `field-${Date.now()}`,
       label: 'New Field',
-      type: 'text',
+      type: DataTypes.STRING,
       isRequired: false,
       isSystemField: false,
     };
@@ -201,6 +209,9 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
       updated.splice(index, 0, newItem);
       return updated;
     });
+
+    // Auto-select the new field to open FieldConfiguration sidebar
+    setSelectedFieldId(newField.id);
   }, []);
 
   /**
@@ -211,7 +222,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
     const newField: FieldData = {
       id: `field-${Date.now()}`,
       label: 'New Field',
-      type: 'text',
+      type: DataTypes.STRING,
       isRequired: false,
       isSystemField: false,
     };
@@ -249,6 +260,9 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
       return updated;
     });
+
+    // Auto-select the new field to open FieldConfiguration sidebar
+    setSelectedFieldId(newField.id);
   }, []);
 
   /**
@@ -264,7 +278,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
       fields: withField ? [{
         id: `field-${Date.now()}`,
         label: 'New Field',
-        type: 'text',
+        type: DataTypes.STRING,
         isRequired: false,
         isSystemField: false,
       }] : [],
@@ -426,6 +440,57 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
     // In a complete implementation, this would show a context menu
     console.log('Field menu clicked:', fieldId);
   }, []);
+
+  /**
+   * Handle Field Select
+   * Sets the currently selected field for configuration
+   */
+  const handleFieldSelect = useCallback((fieldId: string | null) => {
+    setSelectedFieldId(fieldId);
+  }, []);
+
+  /**
+   * Handle Field Update
+   * Updates specific properties of a field
+   */
+  const handleFieldUpdate = useCallback((fieldId: string, updates: Partial<FieldData>) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.type === 'section') {
+          return {
+            ...item,
+            data: {
+              ...item.data,
+              fields: item.data.fields.map((field) =>
+                field.id === fieldId ? { ...field, ...updates } : field
+              ),
+            },
+          };
+        } else if (item.type === 'field' && item.data.id === fieldId) {
+          // Handle standalone field update
+          return {
+            ...item,
+            data: { ...item.data, ...updates },
+          };
+        }
+        return item;
+      })
+    );
+  }, []);
+
+  /**
+   * Handle Lock Data Type
+   * Mock async function to lock the data type after confirmation
+   */
+  const handleLockDataType = useCallback(async (fieldId: string) => {
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Update field with dataTypeLocked flag
+    handleFieldUpdate(fieldId, { dataTypeLocked: true });
+
+    console.log('Mock API: Data type locked for field:', fieldId);
+  }, [handleFieldUpdate]);
 
   /**
    * Handle Field Reorder
@@ -632,8 +697,30 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
     }
   }, [onCancel]);
 
+  // Create context value
+  const contextValue = {
+    items,
+    selectedFieldId,
+    onSectionToggle: handleSectionToggle,
+    onSectionRename: handleSectionRename,
+    onSectionDelete: handleSectionDelete,
+    onSectionReorder: handleSectionReorder,
+    onFieldLabelChange: handleFieldLabelChange,
+    onFieldEdit: handleFieldEdit,
+    onFieldMenuClick: handleFieldMenuClick,
+    onFieldDelete: handleFieldDelete,
+    onFieldReorder: handleFieldReorder,
+    onFieldSelect: handleFieldSelect,
+    onFieldUpdate: handleFieldUpdate,
+    onAddField: handleAddField,
+    onInsertSection: handleInsertSection,
+    onInsertStandaloneField: handleInsertStandaloneField,
+    onLockDataType: handleLockDataType,
+  };
+
   return (
-    <FormBuilderContainer>
+    <FormBuilderProvider value={contextValue}>
+      <FormBuilderContainer>
       <MainContent>
         {/* Toolbar */}
         <ToolbarContainer>
@@ -723,6 +810,15 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
       {/* Mobile Preview */}
       {showMobilePreview && <MobilePreview items={items} />}
+
+      {/* Field Configuration Drawer */}
+      {selectedFieldId && (
+        <FieldConfiguration
+          fieldId={selectedFieldId}
+          onClose={() => handleFieldSelect(null)}
+        />
+      )}
     </FormBuilderContainer>
+    </FormBuilderProvider>
   );
 };

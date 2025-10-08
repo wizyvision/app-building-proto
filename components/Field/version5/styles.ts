@@ -4,11 +4,13 @@ import { Box, IconButton, TextField } from '@mui/material';
 interface AdminFieldContainerProps {
   isGhost?: boolean;
   isDragOver?: boolean;
+  isSelected?: boolean;
 }
 
 export const AdminFieldContainer = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'isGhost' && prop !== 'isDragOver',
-})<AdminFieldContainerProps>(({ theme, isGhost, isDragOver }) => ({
+  shouldForwardProp: (prop) =>
+    prop !== 'isGhost' && prop !== 'isDragOver' && prop !== 'isSelected',
+})<AdminFieldContainerProps>(({ theme, isGhost, isDragOver, isSelected }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -22,11 +24,29 @@ export const AdminFieldContainer = styled(Box, {
   maxHeight: '56px',
   backgroundColor: theme.palette.common.white,
   opacity: isGhost ? 0.5 : 1,
+  border: isSelected ? `2px solid ${theme.palette.primary.main}` : 'none',
+  borderRadius: isSelected ? theme.shape.borderRadius : 0,
   boxShadow: isDragOver ? theme.shadows[4] : 'none',
-  transition: theme.transitions.create(['opacity', 'box-shadow'], {
-    duration: theme.transitions.duration.shorter,
-  }),
+  transition: theme.transitions.create(
+    ['opacity', 'box-shadow', 'background-color', 'border'],
+    {
+      duration: theme.transitions.duration.shorter,
+    }
+  ),
   position: 'relative',
+  animation: isSelected ? 'pulse 0.5s ease-in-out' : 'none',
+
+  '@keyframes pulse': {
+    '0%': {
+      transform: 'scale(1)',
+    },
+    '50%': {
+      transform: 'scale(1.02)',
+    },
+    '100%': {
+      transform: 'scale(1)',
+    },
+  },
 }));
 
 export const DragHandleWrapper = styled(Box, {
@@ -96,6 +116,14 @@ export const LabelText = styled('p')(({ theme }) => ({
   '&:hover': {
     backgroundColor: '#f0f0f0',
   },
+}));
+
+export const RequiredIndicator = styled('span')(({ theme }) => ({
+  color: theme.palette.error.main,
+  marginLeft: '4px',
+  fontSize: 'inherit',
+  fontWeight: 'inherit',
+  lineHeight: 'inherit',
 }));
 
 export const LabelInput = styled(TextField)(({ theme }) => ({

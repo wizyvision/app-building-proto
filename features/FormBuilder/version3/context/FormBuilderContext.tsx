@@ -18,6 +18,7 @@ import { FormItem, SectionData, FieldData, InsertionPosition } from '../types';
 interface FormBuilderContextValue {
   // State
   items: FormItem[];
+  selectedFieldId: string | null;
 
   // Section Handlers
   onSectionToggle: (sectionId: string) => void;
@@ -36,11 +37,16 @@ interface FormBuilderContextValue {
     targetSectionId: string,
     newIndex: number
   ) => void;
+  onFieldSelect: (fieldId: string | null) => void;
+  onFieldUpdate: (fieldId: string, updates: Partial<FieldData>) => void;
 
   // Insertion Handlers
   onAddField: (sectionId: string) => void;
   onInsertSection: (position: InsertionPosition, withField?: boolean) => void;
   onInsertStandaloneField: (position: InsertionPosition) => void;
+
+  // Data Type Lock
+  onLockDataType: (fieldId: string) => Promise<void>;
 }
 
 const FormBuilderContext = createContext<FormBuilderContextValue | undefined>(undefined);

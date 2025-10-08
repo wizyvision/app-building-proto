@@ -49,6 +49,7 @@ import { InlineInsertionZone } from './InlineInsertionZone';
 import { FieldDropZone } from './FieldDropZone';
 import { FieldListProps } from './types';
 import { convertToFormFieldsFieldData } from './utils/typeConversion';
+import { useFormBuilderContext } from './context/FormBuilderContext';
 
 export const FieldList: React.FC<FieldListProps> = ({
   sectionId,
@@ -63,6 +64,7 @@ export const FieldList: React.FC<FieldListProps> = ({
   onInsertField,
   onAddSection,
 }) => {
+  const { selectedFieldId } = useFormBuilderContext();
   const fieldIds = fields.map((f) => f.id);
 
   return (
@@ -104,6 +106,8 @@ export const FieldList: React.FC<FieldListProps> = ({
               label={field.label}
               type={field.type}
               isSystemField={field.isSystemField}
+              isRequired={field.isRequired}
+              isSelected={selectedFieldId === field.id}
               sectionId={sectionId}
               fieldData={convertToFormFieldsFieldData(field)}
               onLabelChange={(newLabel) => onFieldLabelChange(field.id, newLabel)}

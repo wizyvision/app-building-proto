@@ -83,12 +83,13 @@ export const MobileFieldFactory = ({
   hasMedia = false,
   hasRemarks = false,
   hasActions = false,
-  showAttachments = false
+  showAttachments = false,
 }: MobileFieldFactoryProps) => {
   const fieldType = field?.dataType?.toUpperCase() || 'STRING';
   const fieldKey = field?.fieldKey || '';
   const label = field?.label || 'Field Label';
   const description = field?.description;
+  const required = field?.isRequired;
 
   // Handle field type disambiguation based on fieldKey
   let FieldComponent = fieldRegistry[fieldType] || TextField;
@@ -116,6 +117,7 @@ export const MobileFieldFactory = ({
       hasRemarks={hasRemarks}
       hasActions={hasActions}
       showAttachments={showAttachments}
+      isRequired={required}
     >
       <FieldComponent field={field} />
     </FieldContainer>

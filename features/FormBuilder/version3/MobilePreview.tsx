@@ -47,16 +47,22 @@ import { MobileDevice } from '@/components/mobile/MobileDevice';
 import { MobileSection } from '@/components/mobile/Section';
 import { MobileFieldFactory } from '@/features/Mobile/FieldFactory';
 import { MobilePreviewProps } from './types';
+import { useFormBuilderContext } from './context/FormBuilderContext';
 import {
   MobilePreviewContainer,
   MobilePreviewHeader,
   MobilePreviewContent,
+  MobilePreviewEmptyState,
+  EmptyStatePrimaryText,
+  EmptyStateSecondaryText,
 } from './styles';
 
 export const MobilePreview: React.FC<MobilePreviewProps> = ({
   items,
   onFieldChange,
 }) => {
+  const { selectedFieldId } = useFormBuilderContext();
+
   // Extract sections for expansion state
   const sections = items
     .filter((item) => item.type === 'section')
@@ -126,7 +132,9 @@ export const MobilePreview: React.FC<MobilePreviewProps> = ({
                         ...field,
                         value: '', // Empty value for preview
                         dataType: field.type?.toUpperCase() || 'STRING',
-                        fieldKey: field.label?.toLowerCase().replace(/\s+/g, '_'),
+                        fieldKey: field.key || field.label?.toLowerCase().replace(/\s+/g, '_'),
+                        description: field.helpText || undefined,
+
                       }}
                       showActions={false}
                       showAttachments={false}
@@ -145,7 +153,8 @@ export const MobilePreview: React.FC<MobilePreviewProps> = ({
                     ...field,
                     value: '', // Empty value for preview
                     dataType: field.type?.toUpperCase() || 'STRING',
-                    fieldKey: field.label?.toLowerCase().replace(/\s+/g, '_'),
+                    fieldKey: field.key || field.label?.toLowerCase().replace(/\s+/g, '_'),
+                    description: field.helpText || undefined,
                   }}
                   showActions={false}
                   showAttachments={false}
@@ -157,20 +166,14 @@ export const MobilePreview: React.FC<MobilePreviewProps> = ({
           })}
 
           {items.length === 0 && (
-            <div
-              style={{
-                padding: '48px 16px',
-                textAlign: 'center',
-                color: '#595959',
-              }}
-            >
-              <Typography variant="body1" color="text.secondary">
+            <MobilePreviewEmptyState>
+              <EmptyStatePrimaryText variant="body1">
                 No sections yet
-              </Typography>
-              <Typography variant="body2" color="text.disabled">
+              </EmptyStatePrimaryText>
+              <EmptyStateSecondaryText variant="body2">
                 Add sections and fields to see mobile preview
-              </Typography>
-            </div>
+              </EmptyStateSecondaryText>
+            </MobilePreviewEmptyState>
           )}
         </MobileDevice>
       </MobilePreviewContent>

@@ -17,6 +17,7 @@ import {
   ActionsContainer,
   ActionButton,
   FieldIconContainer,
+  RequiredIndicator,
 } from './styles';
 
 /**
@@ -31,26 +32,32 @@ import {
  * - Different drag handle icon (16x16px custom icon)
  * - Leading icon based on field data type (from iconMapping)
  * - Content section with label
+ * - Required field indicator (red asterisk with 4px gap)
+ * - Selection state with border and background highlight
  * - Edit and menu action buttons
  * - Ghost state: Semi-transparent when dragging
  * - Drag over state: Shows shadow when another field hovers over
  *
  * UX PRINCIPLES APPLIED:
- * - Jakob's Law: Familiar drag handle pattern with compact icon, recognizable field type icons
+ * - Jakob's Law: Familiar drag handle pattern with compact icon, recognizable field type icons, standard required indicator (red asterisk)
  * - Fitts's Law: 24x24px minimum touch targets for all interactive elements
  * - Visual Hierarchy: Drag icon → Field type icon → Label → Actions
+ * - Von Restorff Effect: Selected field stands out with primary color border and subtle background
  *
  * INTERACTIONS:
  * - Click label: Enter edit mode
  * - Drag handle: Reorder fields
  * - Ghost state: Original position shows semi-transparent field while dragging
  * - Drag over: Field shows shadow when another field is dragged over it
+ * - Selection: 2px primary border, 5% opacity background, pulse animation on first selection
  */
 export const Field = ({
   id,
   label,
   type,
   isSystemField = false,
+  isRequired = false,
+  isSelected = false,
   sectionId,
   fieldData,
   onLabelChange,
@@ -135,6 +142,7 @@ export const Field = ({
       style={style}
       isGhost={isDragging}
       isDragOver={isOver}
+      isSelected={isSelected}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -166,7 +174,10 @@ export const Field = ({
               fullWidth
             />
           ) : (
-            <LabelText onClick={handleLabelClick}>{label}</LabelText>
+            <LabelText onClick={handleLabelClick}>
+              {label}
+              {isRequired && <RequiredIndicator>*</RequiredIndicator>}
+            </LabelText>
           )}
         </ContentContainer>
 

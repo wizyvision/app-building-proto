@@ -417,6 +417,8 @@ export const SectionList: React.FC<SectionListProps> = ({
                     label={field.label}
                     type={field.type}
                     isSystemField={field.isSystemField}
+                    isRequired={field.isRequired}
+                    isSelected={selectedFieldId === field.id}
                     sectionId={undefined} // Standalone field - no section
                     fieldData={convertToFormFieldsFieldData(field)}
                     onLabelChange={(newLabel) => onFieldLabelChange(field.id, newLabel)}
@@ -539,6 +541,7 @@ export const SectionList: React.FC<SectionListProps> = ({
                     label={draggedField.label}
                     type={draggedField.type}
                     isSystemField={draggedField.isSystemField}
+                    isRequired={draggedField.isRequired}
                     fieldData={convertToFormFieldsFieldData(draggedField)}
                     onLabelChange={() => {}}
                     onEdit={() => {}}

@@ -16,8 +16,10 @@ export interface FieldData {
   id: string;
   label: string;
   type: FieldType;
+  key?: string; // Field key for API reference (e.g., 'status', 'c123_customField')
   isRequired?: boolean;
   isSystemField?: boolean;
+  dataTypeLocked?: boolean; // Whether the data type has been locked (cannot be changed after save)
   placeholder?: string;
   helpText?: string;
   options?: string[]; // For select, radio, checkbox fields
