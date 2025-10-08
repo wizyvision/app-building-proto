@@ -1,10 +1,13 @@
 /**
- * Form Builder V3 Phase 1 - Prototype Page
+ * Form Builder V3 Phase 1 Demo Component
  *
  * Demonstrates Form Builder v3 with Phase 1 features:
  * - Undo/Redo functionality (simulated - full integration pending)
  * - Template library sidebar
  * - Base FormBuilder v3 functionality
+ *
+ * Usage:
+ * Import this component in route pages to show Phase 1 demo
  */
 
 'use client';
@@ -19,12 +22,6 @@ import { TemplateLibrarySidebar } from '@/features/FormBuilder/version3/componen
 import type { FieldTemplate } from '@/features/FormBuilder/version3/components/Templates/version1/types';
 import { DataTypes } from '@/constants/dataTypes';
 
-/**
- * FormBuilderWithPhase1 - Wrapper component that adds Phase 1 features
- *
- * NOTE: This is a demo showing Phase 1 components. Full integration with
- * FormBuilder's internal state management is pending.
- */
 // Default sections with specified fields (same as base FormBuilder v3)
 const defaultSections: SectionData[] = [
   {
@@ -81,6 +78,12 @@ const defaultSections: SectionData[] = [
   },
 ];
 
+/**
+ * FormBuilderWithPhase1 - Wrapper component that adds Phase 1 features
+ *
+ * NOTE: This is a demo showing Phase 1 components. Full integration with
+ * FormBuilder's internal state management is pending.
+ */
 function FormBuilderWithPhase1() {
   const [initialSections, setInitialSections] = useState<SectionData[]>(defaultSections);
   const { canUndo, canRedo, undo, redo, recordAction, getLastAction } = useUndoRedo();
@@ -165,7 +168,7 @@ function FormBuilderWithPhase1() {
   const lastAction = getLastAction();
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <Box sx={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
       {/* Template Library Sidebar */}
       <TemplateLibrarySidebar onSelectTemplate={handleTemplateSelect} />
 
@@ -212,10 +215,10 @@ function FormBuilderWithPhase1() {
 }
 
 /**
- * Main Page Component
+ * Main Export Component
  * Wraps FormBuilder with UndoRedoProvider
  */
-export default function FormBuilderV3Phase1Page() {
+export function FormBuilderPhase1Demo() {
   return (
     <UndoRedoProvider maxHistorySize={50}>
       <FormBuilderWithPhase1 />

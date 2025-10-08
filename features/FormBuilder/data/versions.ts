@@ -183,14 +183,14 @@ export const formBuilderVersions: Record<string, VersionMetadata> = {
     },
   },
 
-  v3: {
+  '3.0': {
     // Basic Info
-    id: 'v3',
+    id: '3.0',
     version: '3.0',
     title: 'Form Builder v3.0: Insertion Pattern',
     date: '2025-10-07',
-    badgeVariant: 'latest',
-    badgeLabel: 'Latest',
+    badgeVariant: 'prototype',
+    badgeLabel: 'Baseline',
 
     // Case Study Content
     purpose: 'Implement context-aware field/section insertion using a non-invasive overlay pattern that provides progressive disclosure without modifying existing components.',
@@ -282,6 +282,100 @@ export const formBuilderVersions: Record<string, VersionMetadata> = {
       beforeMetric: 'v2.0: 280px field library sidebar always visible',
       afterMetric: 'v3.0: Zero persistent UI, context-aware zones',
       result: 'Result: 280px more horizontal space, cleaner interface with smart interactions',
+    },
+  },
+
+  '3.1': {
+    // Basic Info
+    id: '3.1',
+    version: '3.1',
+    title: 'Form Builder v3.1: Phase 1 Enhancements',
+    date: '2025-10-08',
+    badgeVariant: 'latest',
+    badgeLabel: 'Latest',
+
+    // Case Study Content
+    purpose: 'Enhance form builder with undo/redo functionality and template library for rapid form building and efficient workflows.',
+
+    problemStatement: 'How to enable users to quickly recover from mistakes and rapidly build common form patterns without starting from scratch.',
+
+    solution: '<strong>Phase 1 Features:</strong> Added undo/redo system with visual feedback and collapsible template library sidebar with pre-configured field groups for common use cases.',
+
+    keyFeatures: [
+      'Undo/Redo functionality with keyboard shortcuts (Cmd/Ctrl+Z/Y)',
+      'Visual feedback showing last action description',
+      'Template library sidebar with common field patterns',
+      'One-click template insertion as sections',
+      'Maintains all v3.0 insertion and drag-drop capabilities',
+    ],
+
+    strengths: [
+      'Error recovery reduces user anxiety and experimentation friction',
+      'Templates accelerate form building for common patterns',
+      'Non-destructive workflow encourages exploration',
+      'Keyboard shortcuts for power users',
+      'Template library provides best-practice field configurations',
+    ],
+
+    weaknesses: [
+      'Undo/Redo currently limited to template additions (not full FormBuilder operations)',
+      'Template library adds some visual complexity',
+      'Requires additional horizontal space for sidebar',
+    ],
+
+    designDecisions: 'Built on v3.0 foundation with additive enhancements. Prioritized user confidence through undo/redo and efficiency through templates. Implemented as demo layer to test concepts before full integration.',
+
+    learnings: [
+      'Undo/Redo dramatically increases user confidence to experiment',
+      'Templates reduce time-to-completion for common forms',
+      'Demo wrapper approach allows rapid prototyping of new features',
+      'Visual feedback on undo/redo helps users understand system state',
+    ],
+
+    nextSteps: 'Integrate undo/redo deeply into FormBuilder core. Expand template library with more patterns. Add template customization and user-defined templates.',
+
+    // Additional Metadata
+    bestScenarios: [
+      'Forms with repeating patterns (inspection checklists, surveys)',
+      'Teams building multiple similar forms',
+      'Users who frequently modify and iterate',
+      'Training scenarios where mistakes are common',
+    ],
+
+    userExpertise: [
+      'Accessible to all user levels',
+      'Undo/Redo follows universal conventions',
+      'Templates help beginners with best practices',
+      'Power users benefit from keyboard shortcuts',
+    ],
+
+    designPrinciples: [
+      'Jakob\'s Law: Undo/Redo follows universal Cmd/Ctrl+Z pattern',
+      'Forgiving UI: Easy error recovery reduces anxiety',
+      'Efficiency: Templates reduce repetitive work',
+      'Progressive Disclosure: Template sidebar collapsible',
+      'Feedback: Visual indication of last action performed',
+    ],
+
+    technicalFeasibility: {
+      developmentTime: '1-2 weeks',
+      complexity: 'Medium',
+      maintainability: 'High',
+    },
+
+    // Comparison with previous version
+    comparison: {
+      previousVersion: 'v3.0',
+      changes: [
+        'Added undo/redo with keyboard shortcuts',
+        'Added template library sidebar (collapsible)',
+        'Added action history tracking',
+        'Enhanced toolbar with undo/redo buttons',
+        'Template-to-section conversion logic',
+      ],
+      beforeMetric: 'v3.0: No error recovery, manual field-by-field building',
+      afterMetric: 'v3.1: Full undo/redo + template library for rapid building',
+      result: 'Result: Faster form creation with confidence to experiment',
     },
   },
 };

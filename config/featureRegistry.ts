@@ -51,10 +51,17 @@ export const featureRegistry: Record<string, FeatureMetadata> = {
         isLatest: false,
       },
       {
-        id: 'v3',
+        id: '3.0',
         version: '3.0',
         date: '2025-10-07',
         description: 'Insertion Pattern - Non-invasive overlay system for context-aware field/section insertion with mobile preview',
+        isLatest: false,
+      },
+      {
+        id: '3.1',
+        version: '3.1',
+        date: '2025-10-08',
+        description: 'Phase 1 Enhancements - Added undo/redo functionality and template library sidebar for rapid form building',
         isLatest: true,
       },
     ],
