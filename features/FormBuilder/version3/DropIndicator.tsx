@@ -41,46 +41,53 @@ interface DropIndicatorProps {
 
 /**
  * StyledDropIndicator
- * Box that appears at drop position - matches section header height
+ * Box that appears at drop position - matches InlineInsertionZone spacing
  *
  * STATES:
- * - Hidden: height: 0, opacity: 0 (default)
- * - Visible: height: 56px, opacity: 1 (when isOver) - matches section header
+ * - Default during drag: Matches insertion zone (6px + 1px + 6px = 13px)
+ * - Hover: Full height (56px) with visual feedback
+ * - Not dragging: height: 0 (completely hidden)
  *
  * STYLING:
- * - Height: 56px (visible) - matches section header minHeight
- * - Border: 2px dashed with lighter primary color
- * - Background: Light primary color (theme.palette.primary.lighter or primary[1])
+ * - Height: 56px (hover) / 13px (default during drag) / 0 (not dragging)
+ * - Border: 2px dashed primary color (only when hovered)
+ * - Background: Light primary color (only when hovered)
  * - Width: 100% (full width)
  * - Border radius: 4px for consistency
  * - Transition: Smooth 200ms fade
- * - Padding:
- *   - Field type: 6px top/bottom (0 for first/last to match insertion zones)
- *   - Section type: 0px (sections already have gap spacing)
+ * - Padding: 6px top/bottom (matches InlineInsertionZone) unless first/last
  */
 const StyledDropIndicator = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'isOver' && prop !== 'isFirst' && prop !== 'isLast' && prop !== 'type',
-})<{ isOver: boolean; isFirst?: boolean; isLast?: boolean; type?: 'field' | 'section' }>(({ theme, isOver, isFirst = false, isLast = false, type = 'field' }) => {
-  // Section drop indicators have no padding (sections already have 12px gap)
-  // Field drop indicators have 6px padding (unless first/last)
-  const shouldHavePadding = type === 'field' && isOver;
-  const paddingTop = shouldHavePadding && !isFirst ? theme.spacing(0.75) : 0;
-  const paddingBottom = shouldHavePadding && !isLast ? theme.spacing(0.75) : 0;
+  shouldForwardProp: (prop) => prop !== 'isOver' && prop !== 'isFirst' && prop !== 'isLast' && prop !== 'type' && prop !== 'isVisible',
+})<{ isOver: boolean; isVisible: boolean; isFirst?: boolean; isLast?: boolean; type?: 'field' | 'section' }>(({ theme, isOver, isVisible, isFirst = false, isLast = false, type = 'field' }) => {
+  // Match InlineInsertionZone spacing using MARGIN (not padding)
+  // InlineInsertionZone uses padding on container: 6px top/bottom
+  // We use margin to achieve the same visual spacing
+  const marginTop = !isFirst ? 6 : 0;
+  const marginBottom = !isLast ? 6 : 0;
+
+  // Height logic to match InlineInsertionZone spacing:
+  // - Not visible: 0 height, 0 margin (completely hidden)
+  // - Visible but not hovered: 1px height + margin (matches insertion zone)
+  // - Hovered: 56px height + margin (full drop target)
+  let contentHeight = 0;
+  if (isVisible) {
+    contentHeight = isOver ? 56 : 1; // 1px line when not hovered, 56px when hovered
+  }
 
   return {
-    height: isOver ? '56px' : '0', // Match section header height
-    padding: 0,
-    paddingTop,
-    paddingBottom,
+    height: contentHeight,
+    marginTop: isVisible ? marginTop : 0,
+    marginBottom: isVisible ? marginBottom : 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    backgroundColor: isOver ? theme.palette.primary[1] : 'transparent', // Light primary background
-    border: isOver ? `2px dashed ${theme.palette.primary[3]}` : 'none', // Dashed border with lighter primary
+    backgroundColor: isOver ? theme.palette.primary[1] : 'transparent', // Light primary background only when hovered
+    border: isOver ? `2px dashed ${theme.palette.primary[3]}` : 'none', // Dashed border only when hovered
     borderRadius: theme.spacing(0.5), // 4px
-    opacity: isOver ? 1 : 0,
-    transition: theme.transitions.create(['opacity', 'height', 'padding', 'background-color', 'border'], {
+    opacity: isVisible ? 1 : 0,
+    transition: theme.transitions.create(['opacity', 'height', 'margin', 'background-color', 'border'], {
       duration: theme.transitions.duration.short, // 200ms
     }),
     pointerEvents: 'none', // Don't interfere with drag events
@@ -89,7 +96,14 @@ const StyledDropIndicator = styled(Box, {
 });
 
 export const DropIndicator: React.FC<DropIndicatorProps> = ({ isOver, isFirst = false, isLast = false, type = 'field' }) => {
+  // For field indicators, always visible during drag (isOver is passed from parent)
+  // The isVisible prop allows the indicator to show minimal gap even when not hovered
+  //
+  // Section indicators (type='section') are handled differently - they're positioned absolutely
+  // and only shown when isOver=true, so they don't need the minimal height
+  const isVisible = type === 'section' ? isOver : true;
+
   return (
-    <StyledDropIndicator isOver={isOver} isFirst={isFirst} isLast={isLast} type={type} />
+    <StyledDropIndicator isOver={isOver} isVisible={isVisible} isFirst={isFirst} isLast={isLast} type={type} />
   );
 };

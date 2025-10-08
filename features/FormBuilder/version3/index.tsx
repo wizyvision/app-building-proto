@@ -169,56 +169,6 @@ import React from 'react';
 import { FormBuilder } from './FormBuilder';
 import { SectionData } from './types';
 
-// Mock initial data for demonstration
-const mockInitialSections: SectionData[] = [
-  {
-    id: 'section-1',
-    name: 'System Information',
-    isExpanded: true,
-    isSystem: true,
-    order: 0,
-    fields: [
-      {
-        id: 'field-1',
-        label: 'Inspection Title',
-        type: 'text',
-        isRequired: true,
-        isSystemField: false, // Changed to allow editing
-      },
-      {
-        id: 'field-2',
-        label: 'Description',
-        type: 'textarea',
-        isRequired: false,
-        isSystemField: false, // Changed to allow editing
-      },
-    ],
-  },
-  {
-    id: 'section-2',
-    name: 'Basic Details',
-    isExpanded: true,
-    isSystem: false,
-    order: 1,
-    fields: [
-      {
-        id: 'field-3',
-        label: 'Property Address',
-        type: 'text',
-        isRequired: true,
-        isSystemField: false,
-      },
-      {
-        id: 'field-4',
-        label: 'Inspector Name',
-        type: 'text',
-        isRequired: true,
-        isSystemField: false,
-      },
-    ],
-  },
-];
-
 interface FormBuilderV3Props {
   featureName: string;
   versionId: string;
@@ -237,7 +187,6 @@ export default function FormBuilderV3({ featureName, versionId }: FormBuilderV3P
 
   return (
     <FormBuilder
-      initialSections={mockInitialSections}
       onSave={handleSave}
       onCancel={handleCancel}
       showMobilePreview={true}

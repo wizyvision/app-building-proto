@@ -55,9 +55,28 @@ export const FieldDropZone: React.FC<FieldDropZoneProps> = ({
     },
   });
 
+  // Only render drop indicator when field is being dragged
+  if (!isFieldDragging) {
+    return null;
+  }
+
   return (
-    <div ref={setNodeRef}>
-      <DropIndicator isOver={isOver && isFieldDragging} isFirst={isFirst} isLast={isLast} />
+    <div
+      ref={setNodeRef}
+      style={{
+        // Expand the droppable area vertically to prevent flickering
+        // Uses padding to increase hit area, then negative margin to prevent layout shift
+        // 32px padding creates a 77px hit area (32 + 13 + 32) - larger than field height (64px)
+        // This ensures stable drop zone detection even when dragging quickly
+        paddingTop: '32px',
+        paddingBottom: '32px',
+        marginTop: '-32px',
+        marginBottom: '-32px',
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      <DropIndicator isOver={isOver} isFirst={isFirst} isLast={isLast} />
     </div>
   );
 };

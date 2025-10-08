@@ -83,7 +83,7 @@ export const FieldList: React.FC<FieldListProps> = ({
                 sectionId={sectionId}
                 index={index}
                 isFieldDragging={isFieldDragging}
-                isFirst={true}
+                isFirst={false} // Inside section, not at top of form - needs spacing from header
               />
             )}
 
@@ -94,7 +94,7 @@ export const FieldList: React.FC<FieldListProps> = ({
                 showSectionButton={false}
                 onInsertField={() => onInsertField(0)}
                 spacing="field"
-                isFirst={true}
+                isFirst={false} // Inside section, not at top of form - needs spacing from header
               />
             )}
 

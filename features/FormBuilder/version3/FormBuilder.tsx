@@ -88,12 +88,13 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Typography, Button } from '@mui/material';
+import { Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import ViewStreamIcon from '@mui/icons-material/ViewStream';
+import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import { SectionList } from './SectionList';
-import { InsertionOverlay } from './InsertionOverlay';
 import { MobilePreview } from './MobilePreview';
 import { FormBuilderProps, SectionData, FieldData, InsertionPosition, FormItem } from './types';
 import {
@@ -107,11 +108,60 @@ import {
   EmptyStateIconWrapper,
   AddSectionButton,
 } from './styles';
-import ViewStreamIcon from '@mui/icons-material/ViewStream';
-import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
+import { DataTypes } from '@/constants/dataTypes';
+
+// Default sections with specified fields
+const defaultSections: SectionData[] = [
+  {
+    id: 'section-workflow-status',
+    name: 'Workflow Status',
+    isExpanded: true,
+    isSystem: true,
+    fields: [
+      {
+        id: 'field-status',
+        label: 'Status',
+        type: DataTypes.STATUS_ID,
+        isRequired: true,
+        isSystemField: true,
+      },
+      {
+        id: 'field-date',
+        label: 'Date',
+        type: DataTypes.DATE,
+        isRequired: true,
+        isSystemField: true,
+      },
+    ],
+    order: 0,
+  },
+  {
+    id: 'section-readings-evidence',
+    name: 'Readings & Evidence',
+    isExpanded: true,
+    isSystem: false,
+    fields: [
+      {
+        id: 'field-pressure-reading',
+        label: 'Pressure/Meter Reading (PSI)',
+        type: DataTypes.DOUBLE,
+        isRequired: false,
+        isSystemField: false,
+      },
+      {
+        id: 'field-photo-current-state',
+        label: 'Photo - Current State',
+        type: DataTypes.FILES,
+        isRequired: false,
+        isSystemField: false,
+      },
+    ],
+    order: 1,
+  },
+];
 
 export const FormBuilder: React.FC<FormBuilderProps> = ({
-  initialSections = [],
+  initialSections = defaultSections,
   onSave,
   onCancel,
   showMobilePreview: initialShowMobilePreview = true,
@@ -426,7 +476,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   const handleFieldMoveToStandalone = useCallback(
     (fieldId: string, sourceSectionId: string | null, targetIndex: number) => {
       setItems((prev) => {
-        const updated = [...prev];
+        let updated = [...prev];
 
         if (sourceSectionId) {
           // Moving from section to standalone
@@ -441,11 +491,23 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
           const sourceSection = sourceItem.data;
 
-          // Find and remove field from source section
+          // Find field in source section
           const fieldIndex = sourceSection.fields.findIndex((f) => f.id === fieldId);
           if (fieldIndex === -1) return prev;
 
-          const [field] = sourceSection.fields.splice(fieldIndex, 1);
+          const field = sourceSection.fields[fieldIndex];
+
+          // Create new section with field removed (immutable)
+          const newFields = [...sourceSection.fields];
+          newFields.splice(fieldIndex, 1);
+
+          updated[sourceSectionIndex] = {
+            ...sourceItem,
+            data: {
+              ...sourceSection,
+              fields: newFields,
+            },
+          };
 
           // Insert as standalone field at target index
           updated.splice(targetIndex, 0, { type: 'field', data: field });
@@ -457,10 +519,13 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
           if (sourceIndex === -1) return prev;
 
+          // Remove from current position
           const [field] = updated.splice(sourceIndex, 1);
 
           // Adjust target index if moving down
           const adjustedIndex = sourceIndex < targetIndex ? targetIndex - 1 : targetIndex;
+
+          // Insert at new position
           updated.splice(adjustedIndex, 0, field);
         }
 
@@ -478,19 +543,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
       setItems((prev) => {
         const updated = [...prev];
 
-        // Find target section FIRST (before removing field)
-        const targetSectionIndex = updated.findIndex(
-          (item) => item.type === 'section' && item.data.id === targetSectionId
-        );
-
-        if (targetSectionIndex === -1) return prev;
-
-        const targetItem = updated[targetSectionIndex];
-        if (targetItem.type !== 'section') return prev;
-
-        const targetSection = targetItem.data;
-
-        // Find and remove standalone field
+        // Find standalone field FIRST
         const sourceIndex = updated.findIndex(
           (item) => item.type === 'field' && item.data.id === fieldId
         );
@@ -502,15 +555,44 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
         const field = sourceItem.data;
 
+        // Find target section index (BEFORE removing field, to keep indices correct)
+        const targetSectionIndex = updated.findIndex(
+          (item) => item.type === 'section' && item.data.id === targetSectionId
+        );
+
+        if (targetSectionIndex === -1) return prev;
+
+        const targetItem = updated[targetSectionIndex];
+        if (targetItem.type !== 'section') return prev;
+
         // Remove standalone field from items array
         updated.splice(sourceIndex, 1);
 
-        // Insert field into section
+        // Adjust target section index if it shifted due to removal
+        const adjustedTargetIndex = sourceIndex < targetSectionIndex
+          ? targetSectionIndex - 1
+          : targetSectionIndex;
+
+        // Get target section (with potentially adjusted index)
+        const finalTargetItem = updated[adjustedTargetIndex];
+        if (finalTargetItem.type !== 'section') return prev;
+
+        // Create new section with updated fields
+        const newFields = [...finalTargetItem.data.fields];
         if (targetIndex === -1) {
-          targetSection.fields.push(field);
+          newFields.push(field);
         } else {
-          targetSection.fields.splice(targetIndex, 0, field);
+          newFields.splice(targetIndex, 0, field);
         }
+
+        // Update the section immutably
+        updated[adjustedTargetIndex] = {
+          ...finalTargetItem,
+          data: {
+            ...finalTargetItem.data,
+            fields: newFields,
+          },
+        };
 
         return updated;
       });
@@ -622,6 +704,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 onFieldMoveToStandalone={handleFieldMoveToStandalone}
                 onStandaloneFieldToSection={handleStandaloneFieldToSection}
                 onAddField={handleAddField}
+                onInsertField={handleInsertField}
                 onInsertSection={handleInsertSection}
                 onInsertStandaloneField={handleInsertStandaloneField}
               />

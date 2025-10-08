@@ -16,9 +16,10 @@ export const AdminFieldContainer = styled(Box, {
   padding: 0, // No padding
   paddingLeft: theme.spacing(1), // 8px
   paddingRight: theme.spacing(1), // 8px
+  paddingBottom: theme.spacing(1),
   width: '100%',
-  minHeight: '64px', // Fixed height: 64px
-  maxHeight: '64px',
+  minHeight: '56px', // Fixed height: 64px
+  maxHeight: '56px',
   backgroundColor: theme.palette.common.white,
   opacity: isGhost ? 0.5 : 1,
   boxShadow: isDragOver ? theme.shadows[4] : 'none',
@@ -53,8 +54,6 @@ export const DragIconContainer = styled(Box)(({ theme }) => ({
   overflow: 'hidden',
   flexShrink: 0,
   cursor: 'grab',
-  width: '16px',
-  height: '16px',
 
   '&:active': {
     cursor: 'grabbing',
@@ -131,6 +130,21 @@ export const LabelInput = styled(TextField)(({ theme }) => ({
     fontWeight: 500,
     lineHeight: '24px',
     color: theme.palette.text.primary,
+  },
+}));
+
+export const FieldIconContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  width: '24px',
+  height: '24px',
+  color: theme.palette.text.secondary,
+
+  '& svg': {
+    width: 24,
+    height: 24,
   },
 }));
 

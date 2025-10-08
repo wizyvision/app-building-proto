@@ -5,6 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { AdminFieldProps } from './types';
 import { DragIcon } from './DragIcon';
+import { iconMapping } from '@/constants/iconMapping';
 import {
   AdminFieldContainer,
   DragHandleWrapper,
@@ -15,6 +16,7 @@ import {
   LabelInput,
   ActionsContainer,
   ActionButton,
+  FieldIconContainer,
 } from './styles';
 
 /**
@@ -23,19 +25,20 @@ import {
  * VERSION INFO:
  * - Version: 5
  * - Figma: Version 3 (with different drag handle icon)
- * - Layout: Drag icon + content section + actions
+ * - Layout: Drag icon + field type icon + content section + actions
  *
  * FEATURES:
  * - Different drag handle icon (16x16px custom icon)
+ * - Leading icon based on field data type (from iconMapping)
  * - Content section with label
  * - Edit and menu action buttons
  * - Ghost state: Semi-transparent when dragging
  * - Drag over state: Shows shadow when another field hovers over
  *
  * UX PRINCIPLES APPLIED:
- * - Jakob's Law: Familiar drag handle pattern with compact icon
+ * - Jakob's Law: Familiar drag handle pattern with compact icon, recognizable field type icons
  * - Fitts's Law: 24x24px minimum touch targets for all interactive elements
- * - Visual Hierarchy: Drag icon → Label → Actions
+ * - Visual Hierarchy: Drag icon → Field type icon → Label → Actions
  *
  * INTERACTIONS:
  * - Click label: Enter edit mode
@@ -123,6 +126,9 @@ export const Field = ({
     }
   };
 
+  // Get the icon component based on field type
+  const IconComponent = iconMapping[type as keyof typeof iconMapping];
+
   return (
     <AdminFieldContainer
       ref={setNodeRef}
@@ -142,6 +148,13 @@ export const Field = ({
       {/* Content Section */}
       <ContentSection>
         <ContentContainer>
+          {/* Field Type Icon */}
+          {IconComponent && (
+            <FieldIconContainer>
+              <IconComponent />
+            </FieldIconContainer>
+          )}
+
           {isEditing ? (
             <LabelInput
               inputRef={inputRef}

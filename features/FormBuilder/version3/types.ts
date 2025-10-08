@@ -8,8 +8,6 @@
  * - Event handler signatures
  */
 
-import { ReactNode } from 'react';
-
 /**
  * Field Data Structure
  * Represents a form field with all its configuration
@@ -29,8 +27,36 @@ export interface FieldData {
 /**
  * Field Type Enum
  * All supported field types in the form builder
+ * Using DataType values from FormFields
  */
 export type FieldType =
+  // System Fields
+  | 'FILES'
+  | 'STATUS_ID'
+  | 'TAGS'
+  | 'PRIVACY_ID'
+  | 'WATCHERS'
+  | 'SITE'
+  | 'MEM_ID'
+  | 'REF_ID'
+  | 'TYPE_ID'
+  // Custom Fields
+  | 'STRING'
+  | 'TEXT'
+  | 'BOOLEAN'
+  | 'CHECKBOX'
+  | 'SELECT'
+  | 'DATE'
+  | 'TIME'
+  | 'DOUBLE'
+  | 'LOCATION'
+  | 'PEOPLE'
+  | 'PEOPLE_LIST'
+  | 'SIGNATURE'
+  | 'FILE_LIST'
+  | 'MULTIPLE_CHOICE'
+  | 'TAGS_DROPDOWN'
+  // Legacy lowercase types (for backward compatibility)
   | 'text'
   | 'textarea'
   | 'number'
@@ -170,6 +196,7 @@ export interface SectionListProps {
   onFieldMoveToStandalone: (fieldId: string, sourceSectionId: string | null, targetIndex: number) => void; // Move field to standalone (from section or reorder standalone)
   onStandaloneFieldToSection: (fieldId: string, targetSectionId: string, targetIndex: number) => void; // Move standalone field into section
   onAddField: (sectionId: string) => void;
+  onInsertField: (position: InsertionPosition) => void; // Insert field at specific position in section
   onInsertSection: (position: InsertionPosition, withField?: boolean) => void;
   onInsertStandaloneField: (position: InsertionPosition) => void; // New handler for standalone fields
 }

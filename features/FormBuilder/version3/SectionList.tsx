@@ -94,6 +94,7 @@ export const SectionList: React.FC<SectionListProps> = ({
   onFieldMoveToStandalone,
   onStandaloneFieldToSection,
   onAddField,
+  onInsertField,
   onInsertSection,
   onInsertStandaloneField,
 }) => {
@@ -330,7 +331,10 @@ export const SectionList: React.FC<SectionListProps> = ({
                       onAddField={() => onAddField(section.id)}
                       onInsertField={(index) => {
                         // Insert field at specific index in section
-                        onAddField(section.id);
+                        onInsertField({
+                          sectionId: section.id,
+                          fieldIndex: index,
+                        });
                       }}
                       onAddSection={() => onInsertSection({ sectionIndex: itemIndex + 1 })}
                     />
@@ -352,29 +356,46 @@ export const SectionList: React.FC<SectionListProps> = ({
                 </Box>
               );
 
-              // Add insertion zone after section (NO drop zones between sections during field drag)
-              // Drop zones between sections block the sections themselves!
-              // Fields can be dropped: inside sections, at top of form, or at bottom of form
-              if (itemIndex < items.length - 1 && !isDraggingSection && !isDraggingField) {
-                elements.push(
-                  <InlineInsertionZone
-                    key={`insertion-after-${section.id}`}
-                    showFieldButton
-                    showSectionButton
-                    onInsertField={() => onInsertStandaloneField({ sectionIndex: itemIndex + 1 })}
-                    onInsertSection={() => onInsertSection({ sectionIndex: itemIndex + 1 })}
-                    spacing="section"
-                  />
-                );
+              // Add insertion zone OR drop zone after section
+              if (itemIndex < items.length - 1) {
+                if (isDraggingField) {
+                  // Show drop zone when dragging field (allows dropping to standalone area between sections)
+                  elements.push(
+                    <Box key={`drop-after-${section.id}`} sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                      <Box sx={{ minWidth: '500px', maxWidth: '700px', width: '100%' }}>
+                        <FieldDropZone
+                          id={`standalone-drop-after-section-${section.id}`}
+                          sectionId="standalone"
+                          index={itemIndex + 1}
+                          isFieldDragging={true}
+                        />
+                      </Box>
+                    </Box>
+                  );
+                } else if (!isDraggingSection) {
+                  // Show insertion zone when not dragging
+                  elements.push(
+                    <InlineInsertionZone
+                      key={`insertion-after-${section.id}`}
+                      showFieldButton
+                      showSectionButton
+                      onInsertField={() => onInsertStandaloneField({ sectionIndex: itemIndex + 1 })}
+                      onInsertSection={() => onInsertSection({ sectionIndex: itemIndex + 1 })}
+                      spacing="section"
+                    />
+                  );
+                }
               }
 
               return elements;
             } else if (item.type === 'field') {
               // Render standalone field with drop zones
               const field = item.data;
+              const isThisFieldBeingDragged = activeId === field.id && isDraggingField;
 
               // Drop zone before this standalone field (when dragging)
-              if (isDraggingField && itemIndex > 0) {
+              // Skip if this is the field being dragged (avoid double drop zones)
+              if (isDraggingField && itemIndex > 0 && !isThisFieldBeingDragged) {
                 elements.push(
                   <Box key={`drop-before-${field.id}`} sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                     <Box sx={{ minWidth: '500px', maxWidth: '700px', width: '100%' }}>
@@ -406,8 +427,9 @@ export const SectionList: React.FC<SectionListProps> = ({
               );
 
               // Add insertion zone or drop zone after standalone field
+              // Skip if this is the field being dragged (avoid double drop zones)
               if (itemIndex < items.length - 1) {
-                if (isDraggingField) {
+                if (isDraggingField && !isThisFieldBeingDragged) {
                   elements.push(
                     <Box key={`drop-after-${field.id}`} sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                       <Box sx={{ minWidth: '500px', maxWidth: '700px', width: '100%' }}>

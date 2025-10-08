@@ -35,6 +35,7 @@ import { PrivacyField } from './Privacy';
 import { StatusField } from './Status';
 import { SelectField } from './Select';
 import { NumberField } from './Number';
+import { FilesField } from './Files';
 import { FieldContainer } from '@/features/Mobile/FieldContainer';
 
 interface MobileFieldProps {
@@ -52,6 +53,8 @@ interface MobileFieldProps {
  * - STATUS_ID: Status (fieldKey: statusId)
  * - SELECT: Select (fieldKey: {prefix}{n}_{label})
  * - DOUBLE: Number (fieldKey: {prefix}{n}_{label})
+ * - FILES: Files (fieldKey: {prefix}{n}_{label})
+ * - FILE_LIST: Files (fieldKey: {prefix}{n}_{label})
  */
 export const fieldRegistry: Record<string, React.FC<MobileFieldProps>> = {
   STRING: TextField,
@@ -61,6 +64,8 @@ export const fieldRegistry: Record<string, React.FC<MobileFieldProps>> = {
   STATUS_ID: StatusField,
   SELECT: SelectField,
   DOUBLE: NumberField,
+  FILES: FilesField,
+  FILE_LIST: FilesField,
 };
 
 interface MobileFieldFactoryProps {

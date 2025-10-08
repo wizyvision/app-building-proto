@@ -4,7 +4,134 @@
 
 ---
 
+## ⚡ BEFORE YOU START (SAVE TIME)
+
+**MANDATORY: Check these first to avoid redundant work:**
+
+1. **Check the CHANGELOG below** - Recent features may already be implemented
+2. **Check feature-specific CLAUDE.md files** - Individual features have detailed documentation:
+   - `features/[FeatureName]/CLAUDE.md` - Feature-specific implementation details
+   - `components/[ComponentName]/CLAUDE.md` - Component-specific guidelines
+3. **Search the codebase** - The feature you're asked to build may already exist in another version
+
+**Why this matters:**
+- Saves time by not re-implementing existing features
+- Provides context on recent changes and decisions
+- Ensures you understand current implementation patterns
+
+**Example workflow:**
+```
+User asks: "Add drag-and-drop to FormBuilder"
+
+❌ WRONG: Immediately start implementing
+✅ CORRECT:
+  1. Check CHANGELOG → See "FormBuilder Version 3" has drag-drop
+  2. Check features/FormBuilder/version3/CLAUDE.md → Find implementation details
+  3. Review existing code → Understand current approach
+  4. Then proceed with informed implementation
+```
+
+---
+
 ## 📝 CHANGELOG
+
+### FormBuilder Version 3 + Field v5 + Constants - 2025-10-08
+
+**Major Changes:**
+
+#### Field Component Version 5
+- **Field Type Icons**: Added leading icon to field component based on data type
+  - Icons positioned between drag handle and label
+  - 24x24px icon size (consistent with action buttons)
+  - Uses `iconMapping` constant for type-to-icon conversion
+  - Visual hierarchy: Drag handle → Field type icon → Label → Actions
+
+- **Layout Adjustments**:
+  - Reduced field height from 64px to 56px (more compact)
+  - Added 8px bottom padding for better spacing
+  - Icon container: 24x24px with proper alignment
+
+- **Icon Support**: All field data types now have corresponding icons
+  - System fields: STATUS_ID, FILES, TAGS, WATCHERS, SITE, etc.
+  - Custom fields: STRING, TEXT, DATE, DOUBLE, SELECT, etc.
+  - Fallback: No icon shown if type not in mapping
+
+#### Icon Mapping Enhancements
+- **Expanded Icon Mapping**: Added icons for all DataTypes
+  - System Fields: STATUS_ID (ArrowDropdown), FILES (AttachFile), PRIVACY_ID (ArrowDropdown)
+  - Complete coverage for all DataTypes constants
+  - Organized by category (System Fields, Custom Fields, Additional Fields)
+
+#### Constants Architecture
+- **Created DataTypes Constants** (`constants/dataTypes.ts`)
+  - All field data types as constants (UPPERCASE values)
+  - System fields: FILES, STATUS_ID, TAGS, PRIVACY_ID, WATCHERS, etc.
+  - Custom fields: STRING, TEXT, DATE, DOUBLE, SELECT, etc.
+  - Type-safe with `DataType` type export
+
+- **Created SystemKeys Constants** (`constants/systemKeys.ts`)
+  - Field key identifiers (camelCase values)
+  - Common metadata keys: title, description, createdAt, status, etc.
+  - Clear distinction from DataTypes (key vs dataType property)
+
+- **Usage Documentation**:
+  - `dataType` property uses DataTypes (UPPERCASE)
+  - `key` property uses SystemKeys (camelCase)
+  - No more magic strings in field definitions
+
+#### FormBuilder Enhancements
+- **Default Data Structure**: Added default sections with realistic fields
+  - "Workflow Status" section with Status and Date fields
+  - "Readings & Evidence" section with Pressure Reading and Photo fields
+  - Uses DataTypes constants instead of hardcoded strings
+  - Provides immediate visual feedback in prototype
+
+- **Field Movement Improvements**:
+  - Enhanced standalone field movement logic
+  - Better field-to-section and section-to-standalone conversions
+  - Maintains field order during complex drag operations
+
+- **Type System Updates**:
+  - Extended FieldType to include all DataTypes values
+  - Backward compatibility with lowercase legacy types
+  - Added `onInsertField` handler to SectionListProps
+
+#### Mobile Preview
+- **Field Factory Integration**: Added support for Files field type
+  - Renders AttachmentField for FILES data type
+  - Complete field type coverage in mobile preview
+
+**Files Modified:**
+- `components/Field/version5/Field.tsx` - Added field type icon rendering
+- `components/Field/version5/styles.ts` - Added FieldIconContainer, adjusted heights and padding
+- `components/Field/version5/DragIcon.tsx` - Minor icon size adjustments
+- `constants/iconMapping.ts` - Expanded icon mapping for all DataTypes
+- `constants/dataTypes.ts` - NEW: DataTypes constants
+- `constants/systemKeys.ts` - NEW: SystemKeys constants
+- `features/FormBuilder/version3/FormBuilder.tsx` - Default sections, DataTypes usage
+- `features/FormBuilder/version3/types.ts` - Extended FieldType, added onInsertField handler
+- `features/FormBuilder/version3/FieldDropZone.tsx` - Type updates
+- `features/FormBuilder/version3/FieldList.tsx` - Type updates
+- `features/FormBuilder/version3/SectionList.tsx` - Handler prop additions
+- `features/FormBuilder/version3/DropIndicator.tsx` - Positioning refinements
+- `features/Mobile/FieldFactory/index.tsx` - Added FILES field support
+- `app/prototypes/form-builder/version/3/page.tsx` - Removed hardcoded initialSections
+- `CLAUDE.md` - Added Field Data Structure documentation, constants usage guide
+
+**Breaking Changes:**
+- None (backward compatible)
+- Legacy lowercase field types still supported alongside DataTypes constants
+
+**Documentation Updates:**
+- Added comprehensive Field Data Structure section to CLAUDE.md
+- Documented DataTypes vs SystemKeys distinction
+- Added usage examples for constants
+- Updated "BEFORE YOU START" section with CHANGELOG check reminder
+
+**Known Issues:**
+- None
+
+---
 
 ### FormBuilder Version 3 - 2025-10-07
 
@@ -1252,6 +1379,222 @@ Ask yourself:
 6. Would a user find this familiar and easy to use?
 
 If any answer is "no" or "unsure", STOP and fix it before proceeding.
+
+---
+
+## 📊 FIELD DATA STRUCTURE (REFERENCE)
+
+### Complete Field Type Definition
+
+This is the canonical field data structure used throughout the WizyVision application. All field-related components MUST adhere to this structure.
+
+```typescript
+export type Field = {
+  id: number;
+  creatorId: number;
+  dataType: string;
+  description: null | string;
+  descriptionIntl: Intl | null;
+  helper: null;
+  helperTextIntl: null;
+  intl?: Intl;
+  iconName: null | string;
+  instructionText: null | string;
+  isRequired: boolean;
+  isSystem: boolean;
+  isVisible: boolean;
+  key: string;
+  label: string;
+  logics: Logic[] | null;
+  lookupSettings: LookupSettings | null;
+  position: number;
+  readOnly: boolean;
+  selectOptions: SelectOption[] | null;
+  defaultValue: DefaultValue | null;
+  attachmentSettings: AttachmentSettings | null;
+  remarkSettings: AttachmentSettings | null;
+  settings: SettingsClass | null;
+  shownInList: boolean;
+  typeId: number;
+  validations: Validations | null;
+  layoutWebFormPosition: number | null;
+  layoutMobileFormPosition: number | null;
+  layoutCaseListPosition: number | null;
+  layoutPrintPosition: number | null;
+  layoutCaseCardVisibility: boolean;
+  linkableAppIds: number[] | null;
+  linkableAppMapping: LinkableAppMapping | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  statuses?: Status[];
+};
+
+export type LinkableAppMapping = {
+  [key: string]: LinkableAppData;
+};
+
+export type LinkableAppData = { mapping: any; type: string };
+
+export type DefaultValue = {
+  type: string;
+  unit?: string | null | undefined;
+  value: string | null;
+};
+
+export type LookupSettings = {
+  url: string;
+  authHeader: string;
+};
+
+export type Logic = {
+  value: string;
+  targetFieldKeys: string[];
+};
+
+export type SelectOption = {
+  id: string | number;
+  value: string;
+  intl?: Intl;
+  position?: number;
+};
+
+export type PeopleSelectOption = SelectOption & {
+  imageUrl?: string;
+  type?: string;
+};
+
+export type AttachmentSettings = {
+  value: string;
+  condition: string;
+};
+
+export type SettingsClass = {
+  scanningOrder?: number;
+  scanner?: null;
+  canAttachFile?: boolean;
+  canAddRemarks?: boolean;
+  isMultipleScan?: boolean;
+  isUniqueField?: boolean;
+  formulaType?: null;
+  responseTemplateId?: number;
+  unit?: string;
+  displayFormat?: 'PERCENT';
+  threshold?: {
+    min?: number;
+    max?: number;
+  };
+  isTracked?: boolean;
+};
+
+export type Validations = {
+  type: string;
+  errorMessage: string;
+  details: Details;
+};
+
+export type Details = {
+  pattern: string;
+  condition: string;
+  value?: string;
+  min?: number;
+  max?: number;
+};
+
+export enum AttachmentSettingsConditionType {
+  always = 'always',
+  contains = 'in',
+  equals = '=',
+}
+
+export type Status = {
+  // fields attached on Case
+  id: number;
+  color: string;
+  intl?: Intl;
+  name: string;
+  displayName?: string;
+
+  // complete Status fields
+  createdAt: Date;
+  deletedAt: null;
+  memId: number;
+  position: number;
+  postTypeId: number;
+  systemId: string;
+  type: string;
+  updatedAt: Date;
+};
+```
+
+### Usage Rules
+
+**CRITICAL: Use Constants, Not Hardcoded Strings**
+
+```typescript
+// ❌ WRONG - Hardcoded strings
+const field = {
+  type: 'STATUS_ID',
+  dataType: 'DATE'
+};
+
+// ✅ CORRECT - Use constants
+import { DataTypes } from '@/constants/dataTypes';
+
+const field = {
+  type: DataTypes.STATUS_ID,
+  dataType: DataTypes.DATE
+};
+```
+
+**Field Constants Location:**
+- **DataTypes**: `/constants/dataTypes.ts` - Field data types (UPPERCASE values)
+- **SystemKeys**: `/constants/systemKeys.ts` - Field key identifiers (camelCase values)
+- Import and use constants throughout the application
+- Never use magic strings for field types or keys
+
+**IMPORTANT: DataTypes vs SystemKeys Distinction:**
+
+```typescript
+// DataTypes - Field data types (UPPERCASE values)
+// Used for the `dataType` property
+import { DataTypes } from '@/constants/dataTypes';
+
+DataTypes.STATUS_ID    // 'STATUS_ID'
+DataTypes.DATE         // 'DATE'
+DataTypes.FILES        // 'FILES'
+DataTypes.STRING       // 'STRING'
+DataTypes.DOUBLE       // 'DOUBLE'
+
+// SystemKeys - Field key identifiers (camelCase values)
+// Used for the `key` property
+import { SystemKeys } from '@/constants/systemKeys';
+
+SystemKeys.TITLE          // 'title'
+SystemKeys.DESCRIPTION    // 'description'
+SystemKeys.CREATED_AT     // 'createdAt'
+SystemKeys.STATUS         // 'status'
+```
+
+**Usage Pattern:**
+- `dataType` field property uses **DataTypes** (UPPERCASE)
+- `key` field property uses **SystemKeys** (camelCase)
+- These are in separate files because they serve different purposes
+
+**Example Field Object:**
+```typescript
+import { DataTypes } from '@/constants/dataTypes';
+import { SystemKeys } from '@/constants/systemKeys';
+
+const field = {
+  id: 1,
+  key: SystemKeys.TITLE,          // 'title' (camelCase)
+  dataType: DataTypes.STRING,     // 'STRING' (UPPERCASE)
+  label: 'Title',
+  isRequired: true,
+  isSystem: true,
+};
+```
 
 ---
 
