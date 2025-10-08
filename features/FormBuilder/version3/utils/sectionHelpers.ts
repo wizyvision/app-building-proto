@@ -68,5 +68,5 @@ export function isSectionEmpty(section: SectionData): boolean {
  * Rename section
  */
 export function renameSection(items: FormItem[], sectionId: string, newTitle: string): FormItem[] {
-  return updateSectionInItems(items, sectionId, { title: newTitle });
+  return updateSectionInItems(items, sectionId, { name: newTitle });
 }

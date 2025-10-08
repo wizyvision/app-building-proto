@@ -103,8 +103,8 @@ function FormBuilderWithPhase1() {
         type: templateField.dataType,
         isRequired: templateField.isRequired,
         isSystemField: templateField.isSystem,
-        description: templateField.description,
-        placeholder: templateField.placeholder,
+        description: templateField.description ?? undefined,
+        placeholder: templateField.placeholder ?? undefined,
       })),
       order: initialSections.length,
     };

@@ -354,7 +354,6 @@ export const Section: React.FC = () => {
   // Select component based on version
   const SectionComponent = currentVersion === 1 ? SectionV1 : currentVersion === 2 ? SectionV2 : SectionV3;
   const SectionContent = currentVersion === 1 ? SectionContentV1 : currentVersion === 2 ? SectionContentV2 : SectionContentV3;
-  const Field = currentVersion === 1 ? FieldV1 : currentVersion === 2 ? FieldV2 : FieldV5;
 
   // Custom collision detection: prioritize field drop zones over sections
   const customCollisionDetection = (args: any) => {
@@ -467,12 +466,29 @@ export const Section: React.FC = () => {
                         <Box key={field.id}>
                           {/* Show drop indicator above this field */}
                           {showIndicatorAbove && <DropIndicatorBox />}
-                          <Field
-                            {...field}
-                            onLabelChange={(newLabel: string) => handleFieldEditLabel(section.id, field.id, newLabel)}
-                            onEdit={() => handleFieldEdit(section.id, field.id)}
-                            onMenuClick={() => console.log('Menu clicked for field:', field.id)}
-                          />
+                          {currentVersion === 1 ? (
+                            <FieldV1
+                              {...field}
+                              sectionId={section.id}
+                              onEditLabel={(newLabel: string) => handleFieldEditLabel(section.id, field.id, newLabel)}
+                              onEdit={() => handleFieldEdit(section.id, field.id)}
+                              onMenuOpen={() => console.log('Menu clicked for field:', field.id)}
+                            />
+                          ) : currentVersion === 2 ? (
+                            <FieldV2
+                              {...field}
+                              onLabelChange={(newLabel: string) => handleFieldEditLabel(section.id, field.id, newLabel)}
+                              onEdit={() => handleFieldEdit(section.id, field.id)}
+                              onMenuClick={() => console.log('Menu clicked for field:', field.id)}
+                            />
+                          ) : (
+                            <FieldV5
+                              {...field}
+                              onLabelChange={(newLabel: string) => handleFieldEditLabel(section.id, field.id, newLabel)}
+                              onEdit={() => handleFieldEdit(section.id, field.id)}
+                              onMenuClick={() => console.log('Menu clicked for field:', field.id)}
+                            />
+                          )}
                           {/* Show drop indicator below this field */}
                           {showIndicatorBelow && <DropIndicatorBoxBelow />}
                         </Box>
@@ -489,12 +505,29 @@ export const Section: React.FC = () => {
         <DragOverlay>
           {activeField ? (
             <DragOverlayContainer>
-              <Field
-                {...activeField}
-                onLabelChange={() => {}}
-                onEdit={() => {}}
-                onMenuClick={() => {}}
-              />
+              {currentVersion === 1 ? (
+                <FieldV1
+                  {...activeField}
+                  sectionId=""
+                  onEditLabel={() => {}}
+                  onEdit={() => {}}
+                  onMenuOpen={() => {}}
+                />
+              ) : currentVersion === 2 ? (
+                <FieldV2
+                  {...activeField}
+                  onLabelChange={() => {}}
+                  onEdit={() => {}}
+                  onMenuClick={() => {}}
+                />
+              ) : (
+                <FieldV5
+                  {...activeField}
+                  onLabelChange={() => {}}
+                  onEdit={() => {}}
+                  onMenuClick={() => {}}
+                />
+              )}
             </DragOverlayContainer>
           ) : null}
         </DragOverlay>

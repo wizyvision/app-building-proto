@@ -103,11 +103,11 @@ export function validateFieldData(field: Partial<FieldData>): string[] {
     errors.push('Label is required');
   }
 
-  if (!field.dataType) {
+  if (!field.type) {
     errors.push('Data type is required');
   }
 
-  if (field.dataType === DataTypes.SELECT && (!field.selectOptions || field.selectOptions.length === 0)) {
+  if (field.type === DataTypes.SELECT && (!field.options || field.options.length === 0)) {
     errors.push('Select fields require at least one option');
   }
 

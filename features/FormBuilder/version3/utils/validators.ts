@@ -34,7 +34,7 @@ export function isValidUrl(url: string): boolean {
  * Validate field label (required, non-empty)
  */
 export function isValidLabel(label: string): boolean {
-  return label && label.trim().length > 0;
+  return Boolean(label && label.trim().length > 0);
 }
 
 /**
