@@ -1,44 +1,23 @@
 /**
- * SectionList Component - Version 3
+ * SectionList Component - Version 3 (Refactored for nested FieldData)
  *
  * COMPONENT PURPOSE:
- * Renders the list of sections using Section v3 components.
- * Manages drag-and-drop context for section reordering and field management.
- * Wraps existing Section components without modification.
+ * Renders the list of root-level items (sections and standalone fields) using nested FieldData structure.
+ * Sections are FieldData items with type='SECTION' and children array.
+ * Manages drag-and-drop context for section and field reordering.
  *
  * UX PRINCIPLES APPLIED:
- * - Jakob's Law: Familiar drag-and-drop pattern for reordering. Users expect
- *   to grab items and move them around, matching patterns from file managers,
- *   email clients, and other standard interfaces.
- *
+ * - Jakob's Law: Familiar drag-and-drop pattern for reordering.
  * - Miller's Law: Groups related fields within sections (typically 5-7 fields).
- *   Section organization helps chunk information into manageable units.
- *
- * - Visual Hierarchy: Sections provide clear visual grouping with elevation
- *   and spacing, making form structure immediately apparent.
- *
- * - Progressive Disclosure: Collapsed sections hide complexity. Users can
- *   expand only what they need, reducing cognitive load.
+ * - Visual Hierarchy: Sections provide clear visual grouping with elevation and spacing.
+ * - Progressive Disclosure: Collapsed sections hide complexity.
  *
  * TECHNICAL ARCHITECTURE:
  * - Uses dnd-kit for drag-and-drop functionality
- * - Section v3 components used without modification
- * - Field v5 components passed as children
+ * - Section v3 components render sections as fields with children
+ * - Field v5 components render standalone fields
  * - State management handled by parent FormBuilder
- *
- * DRAG-AND-DROP BEHAVIOR:
- * - Sections can be reordered by dragging
- * - Fields can be moved within sections
- * - Fields can be moved between sections
- * - Visual feedback during drag operations
- * - Smooth animations for state transitions
- *
- * INTERACTIONS:
- * - Drag section: Reorder sections in the form
- * - Toggle section: Expand/collapse section content
- * - Edit section name: Inline editing with TextField
- * - Delete section: Remove non-system sections
- * - Add field: Opens field configuration drawer
+ * - Nested FieldData structure: sections have children[], standalone fields don't
  */
 
 'use client';
@@ -66,16 +45,11 @@ import { FieldList } from './FieldList';
 import { InlineInsertionZone } from './InlineInsertionZone';
 import { DropIndicator } from './DropIndicator';
 import { FieldDropZone } from './FieldDropZone';
-import { SectionListProps, FormItem } from './types';
+import { SectionListProps, FieldData } from './types';
 import {
   SectionsContainer,
   StandaloneFieldContainer,
-  SectionItemWrapper,
-  DropIndicatorWrapper,
   DragOverlaySectionPreview,
-  DragOverlayFieldPreview,
-  DragOverlayFieldContent,
-  DragOverlayFieldType,
 } from './styles';
 import { useDragDropState } from './hooks/useDragDropState';
 import { convertToFormFieldsFieldData } from './utils/typeConversion';
@@ -102,16 +76,6 @@ export const SectionList: React.FC<SectionListProps> = ({
   const { dragState, handleDragStart, handleDragOver, resetDragState } = useDragDropState();
   const { activeId, overId, isDraggingSection, isDraggingField } = dragState;
 
-  // Extract sections for drag-drop context
-  const sections = items
-    .filter((item) => item.type === 'section')
-    .map((item) => item.data);
-
-  // Extract standalone fields
-  const standaloneFields = items
-    .filter((item) => item.type === 'field')
-    .map((item) => item.data);
-
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -130,7 +94,7 @@ export const SectionList: React.FC<SectionListProps> = ({
       activeId: active.id,
       overId: over?.id,
       activeData: active.data.current,
-      overData: over?.data.current
+      overData: over?.data.current,
     });
 
     if (!over) {
@@ -144,9 +108,9 @@ export const SectionList: React.FC<SectionListProps> = ({
     // SECTION DRAGGING
     if (activeData?.type === 'section') {
       if (overData?.type === 'section') {
-        const oldIndex = sections.findIndex((s) => s.id === active.id);
-        const newIndex = sections.findIndex((s) => s.id === over.id);
-        if (oldIndex !== newIndex) {
+        const oldIndex = items.findIndex((item) => item.id === active.id && item.type === 'SECTION');
+        const newIndex = items.findIndex((item) => item.id === over.id && item.type === 'SECTION');
+        if (oldIndex !== newIndex && oldIndex !== -1 && newIndex !== -1) {
           onSectionReorder(active.id as string, newIndex);
         }
       } else if (overData?.type === 'section-drop-indicator') {
@@ -186,13 +150,13 @@ export const SectionList: React.FC<SectionListProps> = ({
 
         if (isTargetStandalone) {
           // Target is standalone
-          const targetIndex = items.findIndex((item) => item.type === 'field' && item.data.id === over.id);
+          const targetIndex = items.findIndex((item) => item.id === over.id);
           onFieldMoveToStandalone(fieldId, activeData.sectionId || null, targetIndex);
         } else {
           // Target is in section
-          const targetSection = sections.find((s) => s.id === targetSectionId);
-          if (targetSection) {
-            const targetIndex = targetSection.fields.findIndex((f) => f.id === over.id);
+          const targetSection = items.find((item) => item.id === targetSectionId && item.type === 'SECTION') as FieldData | undefined;
+          if (targetSection?.type === 'SECTION' && targetSection.children) {
+            const targetIndex = targetSection.children.findIndex((f) => f.id === over.id);
             if (isSourceStandalone) {
               onStandaloneFieldToSection(fieldId, targetSectionId, targetIndex);
             } else {
@@ -221,10 +185,7 @@ export const SectionList: React.FC<SectionListProps> = ({
     resetDragState();
   };
 
-  const sectionIds = sections.map((s) => s.id);
-  const standaloneFieldIds = standaloneFields.map((f) => f.id);
-  // Combine section IDs and standalone field IDs for sortable context
-  const allSortableIds = [...sectionIds, ...standaloneFieldIds];
+  const itemIds = items.map((item) => item.id);
 
   return (
     <DndContext
@@ -235,22 +196,16 @@ export const SectionList: React.FC<SectionListProps> = ({
       onDragEnd={handleDragEnd}
       onDragCancel={resetDragState}
     >
-      <SortableContext items={allSortableIds} strategy={verticalListSortingStrategy}>
+      <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
         <SectionsContainer>
           {/* Insertion zone / Drop zone at the beginning */}
           {isDraggingField ? (
-            // Show drop zone when dragging field
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
               <Box sx={{ minWidth: '500px', maxWidth: '700px', width: '100%' }}>
-                <FieldDropZone
-                  id="standalone-drop-0"
-                  sectionId="standalone"
-                  index={0}
-                  isFieldDragging={true}
-                />
+                <FieldDropZone id="standalone-drop-0" sectionId="standalone" index={0} isFieldDragging={true} />
               </Box>
             </Box>
-          ) : !isDraggingSection && (
+          ) : !isDraggingSection ? (
             <InlineInsertionZone
               showFieldButton
               showSectionButton
@@ -259,32 +214,28 @@ export const SectionList: React.FC<SectionListProps> = ({
               spacing="section"
               popoverPosition="below"
             />
-          )}
+          ) : null}
 
           {items.flatMap((item, itemIndex) => {
             const elements: JSX.Element[] = [];
 
-            if (item.type === 'section') {
-              const section = item.data;
+            if (item.type === 'SECTION') {
+              const section = item;
               const isSectionDragging = activeId === section.id && isDraggingSection;
               const isSectionOver = overId === section.id;
 
               // Determine if we should show drop indicator above or below this section
-              // Use itemIndex (visual position) instead of sections array index
-              const activeItemIndex = items.findIndex(i => i.type === 'section' && i.data.id === activeId);
-              const overItemIndex = items.findIndex(i => i.type === 'section' && i.data.id === overId);
+              const activeItemIndex = items.findIndex((i) => i.id === activeId && i.type === 'SECTION');
+              const overItemIndex = items.findIndex((i) => i.id === overId && i.type === 'SECTION');
 
               let showIndicatorAbove = false;
               let showIndicatorBelow = false;
 
               if (isDraggingSection && !isSectionDragging && isSectionOver) {
-                // This is the section being hovered over
                 if (activeItemIndex !== -1 && overItemIndex !== -1 && activeItemIndex !== overItemIndex) {
                   if (activeItemIndex < overItemIndex) {
-                    // Dragging down: show indicator below
                     showIndicatorBelow = true;
                   } else {
-                    // Dragging up: show indicator above
                     showIndicatorAbove = true;
                   }
                 }
@@ -293,24 +244,26 @@ export const SectionList: React.FC<SectionListProps> = ({
               elements.push(
                 <Box key={section.id} sx={{ position: 'relative', width: '100%' }}>
                   {showIndicatorAbove && (
-                    <Box sx={{
-                      position: 'absolute',
-                      top: 0,
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: '100%',
-                      maxWidth: '700px',
-                      minWidth: '500px',
-                      zIndex: 100,
-                    }}>
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 0,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '100%',
+                        maxWidth: '700px',
+                        minWidth: '500px',
+                        zIndex: 100,
+                      }}
+                    >
                       <DropIndicator isOver={true} type="section" />
                     </Box>
                   )}
                   <Section
                     id={section.id}
-                    name={section.name}
-                    isExpanded={section.isExpanded}
-                    fieldCount={section.fields.length}
+                    name={section.label}
+                    isExpanded={section.isExpanded ?? true}
+                    fieldCount={section.children?.length ?? 0}
                     isSystem={section.isSystem}
                     isAnySectionDragging={isDraggingSection}
                     onToggle={() => onSectionToggle(section.id)}
@@ -319,18 +272,15 @@ export const SectionList: React.FC<SectionListProps> = ({
                   >
                     <FieldList
                       sectionId={section.id}
-                      fields={section.fields}
-                      isExpanded={section.isExpanded}
+                      fields={section.children ?? []}
+                      isExpanded={section.isExpanded ?? true}
                       isFieldDragging={isDraggingField}
                       onFieldLabelChange={onFieldLabelChange}
                       onFieldEdit={onFieldEdit}
                       onFieldMenuClick={onFieldMenuClick}
-                      onFieldReorder={(fieldId, newIndex) =>
-                        onFieldReorder(fieldId, section.id, section.id, newIndex)
-                      }
+                      onFieldReorder={(fieldId, newIndex) => onFieldReorder(fieldId, section.id, section.id, newIndex)}
                       onAddField={() => onAddField(section.id)}
                       onInsertField={(index) => {
-                        // Insert field at specific index in section
                         onInsertField({
                           sectionId: section.id,
                           fieldIndex: index,
@@ -340,16 +290,18 @@ export const SectionList: React.FC<SectionListProps> = ({
                     />
                   </Section>
                   {showIndicatorBelow && (
-                    <Box sx={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: '100%',
-                      maxWidth: '700px',
-                      minWidth: '500px',
-                      zIndex: 100,
-                    }}>
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '100%',
+                        maxWidth: '700px',
+                        minWidth: '500px',
+                        zIndex: 100,
+                      }}
+                    >
                       <DropIndicator isOver={true} type="section" />
                     </Box>
                   )}
@@ -359,7 +311,6 @@ export const SectionList: React.FC<SectionListProps> = ({
               // Add insertion zone OR drop zone after section
               if (itemIndex < items.length - 1) {
                 if (isDraggingField) {
-                  // Show drop zone when dragging field (allows dropping to standalone area between sections)
                   elements.push(
                     <Box key={`drop-after-${section.id}`} sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                       <Box sx={{ minWidth: '500px', maxWidth: '700px', width: '100%' }}>
@@ -373,7 +324,6 @@ export const SectionList: React.FC<SectionListProps> = ({
                     </Box>
                   );
                 } else if (!isDraggingSection) {
-                  // Show insertion zone when not dragging
                   elements.push(
                     <InlineInsertionZone
                       key={`insertion-after-${section.id}`}
@@ -388,23 +338,17 @@ export const SectionList: React.FC<SectionListProps> = ({
               }
 
               return elements;
-            } else if (item.type === 'field') {
-              // Render standalone field with drop zones
-              const field = item.data;
+            } else {
+              // Render standalone field
+              const field = item;
               const isThisFieldBeingDragged = activeId === field.id && isDraggingField;
 
               // Drop zone before this standalone field (when dragging)
-              // Skip if this is the field being dragged (avoid double drop zones)
               if (isDraggingField && itemIndex > 0 && !isThisFieldBeingDragged) {
                 elements.push(
                   <Box key={`drop-before-${field.id}`} sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                     <Box sx={{ minWidth: '500px', maxWidth: '700px', width: '100%' }}>
-                      <FieldDropZone
-                        id={`standalone-drop-before-${field.id}`}
-                        sectionId="standalone"
-                        index={itemIndex}
-                        isFieldDragging={true}
-                      />
+                      <FieldDropZone id={`standalone-drop-before-${field.id}`} sectionId="standalone" index={itemIndex} isFieldDragging={true} />
                     </Box>
                   </Box>
                 );
@@ -428,7 +372,6 @@ export const SectionList: React.FC<SectionListProps> = ({
               );
 
               // Add insertion zone or drop zone after standalone field
-              // Skip if this is the field being dragged (avoid double drop zones)
               if (itemIndex < items.length - 1) {
                 if (isDraggingField && !isThisFieldBeingDragged) {
                   elements.push(
@@ -459,25 +402,17 @@ export const SectionList: React.FC<SectionListProps> = ({
 
               return elements;
             }
-
-            return [];
           })}
 
           {/* Insertion zone / Drop zone after the last item */}
-          {items.length > 0 && (
-            isDraggingField ? (
-              // Show drop zone when dragging field
+          {items.length > 0 &&
+            (isDraggingField ? (
               <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                 <Box sx={{ minWidth: '500px', maxWidth: '700px', width: '100%' }}>
-                  <FieldDropZone
-                    id={`standalone-drop-${items.length}`}
-                    sectionId="standalone"
-                    index={items.length}
-                    isFieldDragging={true}
-                  />
+                  <FieldDropZone id={`standalone-drop-${items.length}`} sectionId="standalone" index={items.length} isFieldDragging={true} />
                 </Box>
               </Box>
-            ) : !isDraggingSection && (
+            ) : !isDraggingSection ? (
               <InlineInsertionZone
                 showFieldButton
                 showSectionButton
@@ -485,8 +420,7 @@ export const SectionList: React.FC<SectionListProps> = ({
                 onInsertSection={() => onInsertSection({ sectionIndex: items.length })}
                 spacing="section"
               />
-            )
-          )}
+            ) : null)}
         </SectionsContainer>
       </SortableContext>
 
@@ -494,16 +428,15 @@ export const SectionList: React.FC<SectionListProps> = ({
       <DragOverlay dropAnimation={null}>
         {activeId ? (
           isDraggingSection ? (
-            // Preview for dragging sections - show just the header (collapsed)
             (() => {
-              const section = sections.find(s => s.id === activeId);
+              const section = items.find((item) => item.id === activeId && item.type === 'SECTION');
               return section ? (
                 <DragOverlaySectionPreview>
                   <Section
                     id={section.id}
-                    name={section.name}
+                    name={section.label}
                     isExpanded={false}
-                    fieldCount={section.fields.length}
+                    fieldCount={section.children?.length ?? 0}
                     isSystem={section.isSystem}
                     isAnySectionDragging={false}
                     onToggle={() => {}}
@@ -514,23 +447,23 @@ export const SectionList: React.FC<SectionListProps> = ({
               ) : null;
             })()
           ) : isDraggingField ? (
-            // Preview for dragging fields - show actual Field v5 component
             (() => {
-              // Find the field being dragged (check both sections and standalone fields)
-              let draggedField = null;
+              let draggedField: FieldData | null = null;
 
-              // Check section fields first
-              for (const section of sections) {
-                const field = section.fields.find(f => f.id === activeId);
-                if (field) {
-                  draggedField = field;
-                  break;
-                }
-              }
+              // Check root-level fields
+              draggedField = items.find((f) => f.id === activeId && f.type !== 'SECTION') || null;
 
-              // If not found in sections, check standalone fields
+              // Check section fields
               if (!draggedField) {
-                draggedField = standaloneFields.find(f => f.id === activeId);
+                for (const item of items) {
+                  if (item.type === 'SECTION' && item.children) {
+                    const found = item.children.find((f) => f.id === activeId);
+                    if (found) {
+                      draggedField = found;
+                      break;
+                    }
+                  }
+                }
               }
 
               return draggedField ? (

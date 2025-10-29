@@ -66,14 +66,14 @@ export const FieldConfiguration = ({ fieldId, onClose }: FieldConfigurationProps
   const { items, onFieldUpdate, onLockDataType } = useFormBuilderContext();
   const [lockModalOpen, setLockModalOpen] = useState(false);
 
-  // Get all fields from items
+  // Get all fields from items (new nested structure)
   const allFields = items.flatMap((item) => {
-    if (item.type === 'section') {
-      return item.data.fields;
-    } else if (item.type === 'field') {
-      return [item.data];
+    if (item.type === 'SECTION') {
+      return item.children ?? [];
+    } else {
+      // Standalone field
+      return [item];
     }
-    return [];
   });
 
   // Find the current field

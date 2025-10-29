@@ -15,7 +15,7 @@
 import React, { useState, useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import { FormBuilder } from '@/features/FormBuilder/version3';
-import { SectionData } from '@/features/FormBuilder/version3/types';
+import { SectionData, FieldData } from '@/features/FormBuilder/version3/types';
 import { UndoRedoProvider, useUndoRedo } from '@/features/FormBuilder/version3/context/UndoRedoContext';
 import { UndoRedoButtons } from '@/features/FormBuilder/version3/components/UndoRedo/version1';
 import { TemplateLibrarySidebar } from '@/features/FormBuilder/version3/components/Templates/version1';
@@ -155,8 +155,8 @@ function FormBuilderWithPhase1() {
     }
   }, [redo]);
 
-  const handleSave = (sections: SectionData[]) => {
-    console.log('Form saved:', sections);
+  const handleSave = (items: FieldData[]) => {
+    console.log('Form saved:', items);
     alert('Form saved! Check console for details.');
   };
 

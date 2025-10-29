@@ -12,12 +12,12 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import { FormBuilder } from '@/features/FormBuilder/version3';
-import { SectionData } from '@/features/FormBuilder/version3/types';
+import { FieldData } from '@/features/FormBuilder/version3/types';
 import { PrototypeNav } from '@/components/PrototypeNav/version1';
 
 export default function FormBuilderV3Page() {
-  const handleSave = (sections: SectionData[]) => {
-    console.log('Form saved:', sections);
+  const handleSave = (items: FieldData[]) => {
+    console.log('Form saved:', items);
     alert('Form saved! Check console for details.');
   };
 

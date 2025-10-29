@@ -167,7 +167,7 @@ export type {
 
 import React from 'react';
 import { FormBuilder } from './FormBuilder';
-import { SectionData } from './types';
+import { FieldData } from './types';
 
 interface FormBuilderV3Props {
   featureName: string;
@@ -175,8 +175,8 @@ interface FormBuilderV3Props {
 }
 
 export default function FormBuilderV3({ featureName, versionId }: FormBuilderV3Props) {
-  const handleSave = (sections: SectionData[]) => {
-    console.log('Form saved:', sections);
+  const handleSave = (items: FieldData[]) => {
+    console.log('Form saved:', items);
     alert('Form saved! Check console for details.');
   };
 

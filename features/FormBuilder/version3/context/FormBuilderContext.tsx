@@ -13,16 +13,16 @@
 'use client';
 
 import React, { createContext, useContext, useCallback } from 'react';
-import { FormItem, SectionData, FieldData, InsertionPosition } from '../types';
+import { SectionData, FieldData, InsertionPosition } from '../types';
 
 interface FormBuilderContextValue {
   // State
-  items: FormItem[];
+  items: FieldData[]; // Root-level items: sections and standalone fields
   selectedFieldId: string | null;
 
   // Section Handlers
   onSectionToggle: (sectionId: string) => void;
-  onSectionRename: (sectionId: string, newName: string) => void;
+  onSectionRename: (sectionId: string, newLabel: string) => void;
   onSectionDelete: (sectionId: string) => void;
   onSectionReorder: (sectionId: string, newIndex: number) => void;
 
@@ -33,8 +33,8 @@ interface FormBuilderContextValue {
   onFieldDelete: (fieldId: string) => void;
   onFieldReorder: (
     fieldId: string,
-    sourceSectionId: string,
-    targetSectionId: string,
+    sourceSectionId: string | null,
+    targetSectionId: string | null,
     newIndex: number
   ) => void;
   onFieldSelect: (fieldId: string | null) => void;

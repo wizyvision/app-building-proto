@@ -9,13 +9,22 @@
  */
 
 /**
- * Field Data Structure
- * Represents a form field with all its configuration
+ * Field Data Structure (Flat Nested Architecture)
+ * Represents both regular fields and sections.
+ * Sections are fields with type: 'SECTION' and contain children array.
+ * Order is determined by array position (no explicit position property).
  */
 export interface FieldData {
   id: string;
   label: string;
   type: FieldType;
+
+  // Section-specific properties (when type === 'SECTION')
+  children?: FieldData[]; // Fields belonging to this section
+  isExpanded?: boolean;
+  isSystem?: boolean;
+
+  // Field-specific properties (when type !== 'SECTION')
   key?: string; // Field key for API reference (e.g., 'status', 'c123_customField')
   isRequired?: boolean;
   isSystemField?: boolean;
@@ -32,6 +41,8 @@ export interface FieldData {
  * Using DataType values from FormFields
  */
 export type FieldType =
+  // Section Type
+  | 'SECTION'
   // System Fields
   | 'FILES'
   | 'STATUS_ID'
@@ -82,8 +93,9 @@ export interface ValidationRule {
 }
 
 /**
- * Section Data Structure
- * Represents a collapsible section containing fields
+ * Legacy Section Data Structure
+ * @deprecated Use FieldData with type: 'SECTION' instead
+ * Kept for migration purposes
  */
 export interface SectionData {
   id: string;
@@ -95,8 +107,8 @@ export interface SectionData {
 }
 
 /**
- * Form Item Type
- * Union type representing either a section or a standalone field
+ * Legacy Form Item Type
+ * @deprecated Use FieldData array directly instead
  */
 export type FormItem =
   | { type: 'section'; data: SectionData }
@@ -107,9 +119,8 @@ export type FormItem =
  * Complete state for the form builder feature
  */
 export interface FormBuilderState {
-  items: FormItem[]; // Array of items where each item is EITHER a Section OR a standalone Field
+  items: FieldData[]; // Root-level items: standalone fields and sections (with children)
   selectedFieldId: string | null;
-  selectedSectionId: string | null;
   insertion: InsertionState;
 }
 
@@ -183,24 +194,25 @@ export interface InsertionOverlayProps {
 /**
  * Section List Props
  * Props for the SectionList component
+ * Works with flat nested FieldData structure
  */
 export interface SectionListProps {
-  items: FormItem[]; // Changed from sections to items (supports both sections and standalone fields)
+  items: FieldData[]; // Root-level items: standalone fields and sections
   onSectionToggle: (sectionId: string) => void;
-  onSectionRename: (sectionId: string, newName: string) => void;
+  onSectionRename: (sectionId: string, newLabel: string) => void;
   onSectionDelete: (sectionId: string) => void;
   onSectionReorder: (sectionId: string, newIndex: number) => void;
   onFieldLabelChange: (fieldId: string, newLabel: string) => void;
   onFieldEdit: (fieldId: string) => void;
   onFieldMenuClick: (fieldId: string) => void;
-  onFieldDelete: (fieldId: string) => void; // Added for standalone field deletion
-  onFieldReorder: (fieldId: string, sourceSectionId: string, targetSectionId: string, newIndex: number) => void;
-  onFieldMoveToStandalone: (fieldId: string, sourceSectionId: string | null, targetIndex: number) => void; // Move field to standalone (from section or reorder standalone)
+  onFieldDelete: (fieldId: string) => void; // Delete standalone field
+  onFieldReorder: (fieldId: string, sourceSectionId: string | null, targetSectionId: string | null, newIndex: number) => void; // Updated signature
+  onFieldMoveToStandalone: (fieldId: string, sourceSectionId: string | null, targetIndex: number) => void; // Move field to standalone
   onStandaloneFieldToSection: (fieldId: string, targetSectionId: string, targetIndex: number) => void; // Move standalone field into section
   onAddField: (sectionId: string) => void;
   onInsertField: (position: InsertionPosition) => void; // Insert field at specific position in section
   onInsertSection: (position: InsertionPosition, withField?: boolean) => void;
-  onInsertStandaloneField: (position: InsertionPosition) => void; // New handler for standalone fields
+  onInsertStandaloneField: (position: InsertionPosition) => void; // Insert standalone field
 }
 
 /**
@@ -226,7 +238,7 @@ export interface FieldListProps {
  * Props for the MobilePreview component
  */
 export interface MobilePreviewProps {
-  items: FormItem[]; // Changed from sections to items (supports both sections and standalone fields)
+  items: FieldData[]; // Root-level items with nested children
   onFieldChange?: (fieldId: string, value: any) => void;
 }
 
@@ -235,8 +247,9 @@ export interface MobilePreviewProps {
  * Main Form Builder component props
  */
 export interface FormBuilderProps {
-  initialSections?: SectionData[];
-  onSave?: (sections: SectionData[]) => void;
+  initialSections?: SectionData[]; // Legacy support - will be converted to new format
+  initialItems?: FieldData[]; // New: direct FieldData items
+  onSave?: (items: FieldData[]) => void; // Returns new format
   onCancel?: () => void;
   showMobilePreview?: boolean;
 }
@@ -251,3 +264,14 @@ export interface DragContext {
   overId: string | null;
   overType: 'section' | 'field' | null;
 }
+
+/**
+ * Type Guards
+ */
+export const isSection = (field: FieldData): field is FieldData & { type: 'SECTION'; children: FieldData[] } => {
+  return field.type === 'SECTION';
+};
+
+export const isRegularField = (field: FieldData): boolean => {
+  return field.type !== 'SECTION';
+};

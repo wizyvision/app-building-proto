@@ -97,7 +97,7 @@ import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import { SectionList } from './SectionList';
 import { MobilePreview } from './MobilePreview';
 import { FieldConfiguration } from '@/features/FieldConfiguration';
-import { FormBuilderProps, SectionData, FieldData, InsertionPosition, FormItem } from './types';
+import { FormBuilderProps, SectionData, FieldData, InsertionPosition } from './types';
 import { FormBuilderProvider } from './context/FormBuilderContext';
 import {
   FormBuilderContainer,
@@ -111,8 +111,9 @@ import {
   AddSectionButton,
 } from './styles';
 import { DataTypes } from '@/constants/dataTypes';
+import { migrateSectionsToItems, createSectionField, createRegularField, findFieldById, findParentSectionId } from './utils/migration';
 
-// Default sections with specified fields
+// Default sections with specified fields (old format - will be converted)
 const defaultSections: SectionData[] = [
   {
     id: 'section-workflow-status',
@@ -170,17 +171,20 @@ const defaultSections: SectionData[] = [
 
 export const FormBuilder: React.FC<FormBuilderProps> = ({
   initialSections = defaultSections,
+  initialItems,
   onSave,
   onCancel,
   showMobilePreview: initialShowMobilePreview = true,
 }) => {
-  // Convert initialSections to items format
-  const initialItems: FormItem[] = initialSections.map((section) => ({
-    type: 'section' as const,
-    data: section,
-  }));
+  // Convert legacy initialSections to new format, or use initialItems directly
+  const getInitialItems = (): FieldData[] => {
+    if (initialItems) {
+      return initialItems;
+    }
+    return migrateSectionsToItems(initialSections);
+  };
 
-  const [items, setItems] = useState<FormItem[]>(initialItems);
+  const [items, setItems] = useState<FieldData[]>(getInitialItems());
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [isInsertionEnabled, setIsInsertionEnabled] = useState(true);
   const [showMobilePreview, setShowMobilePreview] = useState(initialShowMobilePreview);
@@ -190,23 +194,12 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
    * Creates a standalone field (not in a section) at the specified position
    */
   const handleInsertStandaloneField = useCallback((position: InsertionPosition) => {
-    const newField: FieldData = {
-      id: `field-${Date.now()}`,
-      label: 'New Field',
-      type: DataTypes.STRING,
-      isRequired: false,
-      isSystemField: false,
-    };
-
-    const newItem: FormItem = {
-      type: 'field',
-      data: newField,
-    };
+    const newField = createRegularField('New Field', DataTypes.STRING, false);
 
     setItems((prev) => {
       const updated = [...prev];
       const index = position.sectionIndex ?? 0;
-      updated.splice(index, 0, newItem);
+      updated.splice(index, 0, newField);
       return updated;
     });
 
@@ -219,41 +212,30 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
    * Creates a new field at the specified position within a section
    */
   const handleInsertField = useCallback((position: InsertionPosition) => {
-    const newField: FieldData = {
-      id: `field-${Date.now()}`,
-      label: 'New Field',
-      type: DataTypes.STRING,
-      isRequired: false,
-      isSystemField: false,
-    };
+    const newField = createRegularField('New Field', DataTypes.STRING, false);
 
     setItems((prev) => {
       const updated = [...prev];
 
       if (position.sectionId !== undefined) {
-        const itemIndex = updated.findIndex(
-          (item) => item.type === 'section' && item.data.id === position.sectionId
-        );
+        const sectionIndex = updated.findIndex((item) => item.id === position.sectionId && item.type === 'SECTION');
 
-        if (itemIndex !== -1 && updated[itemIndex].type === 'section') {
-          const sectionItem = updated[itemIndex] as { type: 'section'; data: SectionData };
-          const section = sectionItem.data;
-          const newFields = [...section.fields];
+        if (sectionIndex !== -1) {
+          const section = updated[sectionIndex];
+          const children = section.children ?? [];
 
           if (position.fieldIndex === -1) {
             // Append to end
-            newFields.push(newField);
+            children.push(newField);
           } else {
             // Insert at specific index
-            newFields.splice(position.fieldIndex ?? 0, 0, newField);
+            children.splice(position.fieldIndex ?? 0, 0, newField);
           }
 
-          updated[itemIndex] = {
-            ...sectionItem,
-            data: {
-              ...section,
-              fields: newFields,
-            },
+          // Update section with children
+          updated[sectionIndex] = {
+            ...section,
+            children,
           };
         }
       }
@@ -270,25 +252,8 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
    * Creates a new section at the specified position
    */
   const handleInsertSection = useCallback((position: InsertionPosition, withField: boolean = false) => {
-    const newSection: SectionData = {
-      id: `section-${Date.now()}`,
-      name: 'New Section',
-      isExpanded: true,
-      isSystem: false,
-      fields: withField ? [{
-        id: `field-${Date.now()}`,
-        label: 'New Field',
-        type: DataTypes.STRING,
-        isRequired: false,
-        isSystemField: false,
-      }] : [],
-      order: position.sectionIndex ?? items.length,
-    };
-
-    const newItem: FormItem = {
-      type: 'section',
-      data: newSection,
-    };
+    const children = withField ? [createRegularField('New Field', DataTypes.STRING, false)] : [];
+    const newSection = createSectionField('New Section', false, children);
 
     setItems((prev) => {
       const updated = [...prev];
@@ -296,24 +261,15 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
       if (index === -1 || index >= updated.length) {
         // Append to end
-        updated.push(newItem);
+        updated.push(newSection);
       } else {
         // Insert at specific index
-        updated.splice(index, 0, newItem);
+        updated.splice(index, 0, newSection);
       }
 
-      // Update order property for all sections
-      return updated.map((item, idx) => {
-        if (item.type === 'section') {
-          return {
-            ...item,
-            data: { ...item.data, order: idx },
-          };
-        }
-        return item;
-      });
+      return updated;
     });
-  }, [items.length]);
+  }, []);
 
   /**
    * Handle Section Toggle
@@ -321,10 +277,10 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   const handleSectionToggle = useCallback((sectionId: string) => {
     setItems((prev) =>
       prev.map((item) => {
-        if (item.type === 'section' && item.data.id === sectionId) {
+        if (item.id === sectionId && item.type === 'SECTION') {
           return {
             ...item,
-            data: { ...item.data, isExpanded: !item.data.isExpanded },
+            isExpanded: !item.isExpanded,
           };
         }
         return item;
@@ -335,13 +291,13 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   /**
    * Handle Section Rename
    */
-  const handleSectionRename = useCallback((sectionId: string, newName: string) => {
+  const handleSectionRename = useCallback((sectionId: string, newLabel: string) => {
     setItems((prev) =>
       prev.map((item) => {
-        if (item.type === 'section' && item.data.id === sectionId) {
+        if (item.id === sectionId && item.type === 'SECTION') {
           return {
             ...item,
-            data: { ...item.data, name: newName },
+            label: newLabel,
           };
         }
         return item;
@@ -354,7 +310,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
    */
   const handleSectionDelete = useCallback((sectionId: string) => {
     setItems((prev) =>
-      prev.filter((item) => !(item.type === 'section' && item.data.id === sectionId))
+      prev.filter((item) => !(item.id === sectionId && item.type === 'SECTION'))
     );
   }, []);
 
@@ -363,7 +319,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
    */
   const handleFieldDelete = useCallback((fieldId: string) => {
     setItems((prev) =>
-      prev.filter((item) => !(item.type === 'field' && item.data.id === fieldId))
+      prev.filter((item) => !(item.id === fieldId && item.type !== 'SECTION'))
     );
   }, []);
 
@@ -373,24 +329,11 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   const handleSectionReorder = useCallback((sectionId: string, newIndex: number) => {
     setItems((prev) => {
       const updated = [...prev];
-      const oldIndex = updated.findIndex(
-        (item) => item.type === 'section' && item.data.id === sectionId
-      );
+      const oldIndex = updated.findIndex((item) => item.id === sectionId && item.type === 'SECTION');
 
       if (oldIndex !== -1) {
         const [item] = updated.splice(oldIndex, 1);
         updated.splice(newIndex, 0, item);
-
-        // Update order property for sections
-        return updated.map((item, idx) => {
-          if (item.type === 'section') {
-            return {
-              ...item,
-              data: { ...item.data, order: idx },
-            };
-          }
-          return item;
-        });
       }
 
       return updated;
@@ -403,23 +346,26 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   const handleFieldLabelChange = useCallback((fieldId: string, newLabel: string) => {
     setItems((prev) =>
       prev.map((item) => {
-        if (item.type === 'section') {
+        // Change label for section itself
+        if (item.id === fieldId && item.type === 'SECTION') {
+          return { ...item, label: newLabel };
+        }
+
+        // Change label for field at root level
+        if (item.id === fieldId && item.type !== 'SECTION') {
+          return { ...item, label: newLabel };
+        }
+
+        // Change label for field within section
+        if (item.type === 'SECTION' && item.children) {
           return {
             ...item,
-            data: {
-              ...item.data,
-              fields: item.data.fields.map((field) =>
-                field.id === fieldId ? { ...field, label: newLabel } : field
-              ),
-            },
-          };
-        } else if (item.type === 'field' && item.data.id === fieldId) {
-          // Handle standalone field label change
-          return {
-            ...item,
-            data: { ...item.data, label: newLabel },
+            children: item.children.map((field) =>
+              field.id === fieldId ? { ...field, label: newLabel } : field
+            ),
           };
         }
+
         return item;
       })
     );
@@ -456,23 +402,26 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   const handleFieldUpdate = useCallback((fieldId: string, updates: Partial<FieldData>) => {
     setItems((prev) =>
       prev.map((item) => {
-        if (item.type === 'section') {
+        // Update field at root level
+        if (item.id === fieldId && item.type !== 'SECTION') {
+          return { ...item, ...updates };
+        }
+
+        // Update section itself
+        if (item.id === fieldId && item.type === 'SECTION') {
+          return { ...item, ...updates };
+        }
+
+        // Update field within section
+        if (item.type === 'SECTION' && item.children) {
           return {
             ...item,
-            data: {
-              ...item.data,
-              fields: item.data.fields.map((field) =>
-                field.id === fieldId ? { ...field, ...updates } : field
-              ),
-            },
-          };
-        } else if (item.type === 'field' && item.data.id === fieldId) {
-          // Handle standalone field update
-          return {
-            ...item,
-            data: { ...item.data, ...updates },
+            children: item.children.map((field) =>
+              field.id === fieldId ? { ...field, ...updates } : field
+            ),
           };
         }
+
         return item;
       })
     );
@@ -494,39 +443,52 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
   /**
    * Handle Field Reorder
+   * Moves field from one section to another
    */
   const handleFieldReorder = useCallback(
-    (fieldId: string, sourceSectionId: string, targetSectionId: string, newIndex: number) => {
+    (fieldId: string, sourceSectionId: string | null, targetSectionId: string | null, newIndex: number) => {
       setItems((prev) => {
         const updated = [...prev];
 
-        const sourceSectionIndex = updated.findIndex(
-          (item) => item.type === 'section' && item.data.id === sourceSectionId
-        );
-        const targetSectionIndex = updated.findIndex(
-          (item) => item.type === 'section' && item.data.id === targetSectionId
-        );
+        // Find source and target sections
+        const sourceSectionIndex = sourceSectionId
+          ? updated.findIndex((item) => item.id === sourceSectionId && item.type === 'SECTION')
+          : -1;
+        const targetSectionIndex = targetSectionId
+          ? updated.findIndex((item) => item.id === targetSectionId && item.type === 'SECTION')
+          : -1;
 
         if (sourceSectionIndex === -1 || targetSectionIndex === -1) return prev;
 
-        const sourceItem = updated[sourceSectionIndex];
-        const targetItem = updated[targetSectionIndex];
+        const sourceSection = updated[sourceSectionIndex];
+        const targetSection = updated[targetSectionIndex];
 
-        if (sourceItem.type !== 'section' || targetItem.type !== 'section') return prev;
+        if (sourceSection.type !== 'SECTION' || targetSection.type !== 'SECTION') return prev;
+        if (!sourceSection.children || !targetSection.children) return prev;
 
-        const sourceSection = sourceItem.data;
-        const targetSection = targetItem.data;
-
-        const fieldIndex = sourceSection.fields.findIndex((f) => f.id === fieldId);
+        // Find field in source section
+        const fieldIndex = sourceSection.children.findIndex((f) => f.id === fieldId);
         if (fieldIndex === -1) return prev;
 
-        const [field] = sourceSection.fields.splice(fieldIndex, 1);
+        // Extract field from source
+        const [field] = sourceSection.children.splice(fieldIndex, 1);
 
+        // Add to target section
         if (newIndex === -1) {
-          targetSection.fields.push(field);
+          targetSection.children.push(field);
         } else {
-          targetSection.fields.splice(newIndex, 0, field);
+          targetSection.children.splice(newIndex, 0, field);
         }
+
+        // Return updated sections
+        updated[sourceSectionIndex] = {
+          ...sourceSection,
+          children: sourceSection.children,
+        };
+        updated[targetSectionIndex] = {
+          ...targetSection,
+          children: targetSection.children,
+        };
 
         return updated;
       });
@@ -546,40 +508,34 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
         if (sourceSectionId) {
           // Moving from section to standalone
           const sourceSectionIndex = updated.findIndex(
-            (item) => item.type === 'section' && item.data.id === sourceSectionId
+            (item) => item.id === sourceSectionId && item.type === 'SECTION'
           );
 
           if (sourceSectionIndex === -1) return prev;
 
-          const sourceItem = updated[sourceSectionIndex];
-          if (sourceItem.type !== 'section') return prev;
-
-          const sourceSection = sourceItem.data;
+          const sourceSection = updated[sourceSectionIndex];
+          if (sourceSection.type !== 'SECTION' || !sourceSection.children) return prev;
 
           // Find field in source section
-          const fieldIndex = sourceSection.fields.findIndex((f) => f.id === fieldId);
+          const fieldIndex = sourceSection.children.findIndex((f) => f.id === fieldId);
           if (fieldIndex === -1) return prev;
 
-          const field = sourceSection.fields[fieldIndex];
+          const field = sourceSection.children[fieldIndex];
 
-          // Create new section with field removed (immutable)
-          const newFields = [...sourceSection.fields];
-          newFields.splice(fieldIndex, 1);
+          // Remove field from section (immutable)
+          const newChildren = sourceSection.children.filter((f) => f.id !== fieldId);
 
           updated[sourceSectionIndex] = {
-            ...sourceItem,
-            data: {
-              ...sourceSection,
-              fields: newFields,
-            },
+            ...sourceSection,
+            children: newChildren,
           };
 
           // Insert as standalone field at target index
-          updated.splice(targetIndex, 0, { type: 'field', data: field });
+          updated.splice(targetIndex, 0, field);
         } else {
           // Moving from standalone to standalone (reordering)
           const sourceIndex = updated.findIndex(
-            (item) => item.type === 'field' && item.data.id === fieldId
+            (item) => item.id === fieldId && item.type !== 'SECTION'
           );
 
           if (sourceIndex === -1) return prev;
@@ -610,25 +566,22 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
         // Find standalone field FIRST
         const sourceIndex = updated.findIndex(
-          (item) => item.type === 'field' && item.data.id === fieldId
+          (item) => item.id === fieldId && item.type !== 'SECTION'
         );
 
         if (sourceIndex === -1) return prev;
 
-        const sourceItem = updated[sourceIndex];
-        if (sourceItem.type !== 'field') return prev;
-
-        const field = sourceItem.data;
+        const field = updated[sourceIndex];
 
         // Find target section index (BEFORE removing field, to keep indices correct)
         const targetSectionIndex = updated.findIndex(
-          (item) => item.type === 'section' && item.data.id === targetSectionId
+          (item) => item.id === targetSectionId && item.type === 'SECTION'
         );
 
         if (targetSectionIndex === -1) return prev;
 
-        const targetItem = updated[targetSectionIndex];
-        if (targetItem.type !== 'section') return prev;
+        const targetSection = updated[targetSectionIndex];
+        if (targetSection.type !== 'SECTION' || !targetSection.children) return prev;
 
         // Remove standalone field from items array
         updated.splice(sourceIndex, 1);
@@ -639,24 +592,21 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
           : targetSectionIndex;
 
         // Get target section (with potentially adjusted index)
-        const finalTargetItem = updated[adjustedTargetIndex];
-        if (finalTargetItem.type !== 'section') return prev;
+        const finalTargetSection = updated[adjustedTargetIndex];
+        if (finalTargetSection.type !== 'SECTION' || !finalTargetSection.children) return prev;
 
-        // Create new section with updated fields
-        const newFields = [...finalTargetItem.data.fields];
+        // Create new children array with the field
+        const newChildren = [...finalTargetSection.children];
         if (targetIndex === -1) {
-          newFields.push(field);
+          newChildren.push(field);
         } else {
-          newFields.splice(targetIndex, 0, field);
+          newChildren.splice(targetIndex, 0, field);
         }
 
         // Update the section immutably
         updated[adjustedTargetIndex] = {
-          ...finalTargetItem,
-          data: {
-            ...finalTargetItem.data,
-            fields: newFields,
-          },
+          ...finalTargetSection,
+          children: newChildren,
         };
 
         return updated;
@@ -680,11 +630,8 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
    */
   const handleSave = useCallback(() => {
     if (onSave) {
-      // Convert items back to sections format for backward compatibility
-      const sections = items
-        .filter((item) => item.type === 'section')
-        .map((item) => item.data as SectionData);
-      onSave(sections);
+      // Return new nested FieldData format
+      onSave(items);
     }
   }, [items, onSave]);
 

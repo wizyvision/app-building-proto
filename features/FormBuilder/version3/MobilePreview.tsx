@@ -1,42 +1,25 @@
 /**
- * MobilePreview Component - Version 3
+ * MobilePreview Component - Version 3 (Refactored for nested FieldData)
  *
  * COMPONENT PURPOSE:
  * Displays a real-time mobile preview of the form being built.
  * Uses mobile-specific Section and Field components to show how the form
  * will appear on mobile devices. Syncs with desktop form builder state.
+ * Works with nested FieldData structure where sections have children arrays.
  *
  * UX PRINCIPLES APPLIED:
  * - Jakob's Law: Familiar mobile device frame that users recognize instantly.
- *   Provides realistic context for how forms appear on actual devices.
- *
- * - Visual Hierarchy: Clear separation between desktop builder (left) and
- *   mobile preview (right). Device frame creates visual boundary.
- *
- * - Contextual Awareness: Shows real mobile interactions (touch-optimized)
- *   rather than scaled-down desktop version. Accurate preview builds confidence.
- *
- * - Fitts's Law: Preview is fixed-width, matching actual mobile dimensions
- *   (375px iPhone width), ensuring touch targets are accurately represented.
+ * - Visual Hierarchy: Clear separation between desktop builder (left) and mobile preview (right).
+ * - Contextual Awareness: Shows real mobile interactions (touch-optimized).
+ * - Fitts's Law: Preview is fixed-width, matching actual mobile dimensions (375px iPhone width).
  *
  * TECHNICAL ARCHITECTURE:
  * - Uses MobileDevice component for device frame
  * - Uses mobile Section component (non-draggable)
  * - Uses mobile Field components (touch-optimized)
  * - Syncs state from parent FormBuilder
+ * - Works with nested FieldData: sections have children[], standalone fields don't
  * - Read-only preview (no editing in mobile view)
- *
- * MOBILE-SPECIFIC STYLING:
- * - Exact Figma specifications for mobile components
- * - Touch-optimized targets (48x48px minimum)
- * - Mobile typography and spacing
- * - Scrollable content within device frame
- *
- * INTERACTIONS:
- * - Expand/collapse sections (preview only)
- * - Scroll content (within device frame)
- * - No editing or drag-drop (read-only preview)
- * - Syncs with desktop form changes in real-time
  */
 
 'use client';
@@ -46,7 +29,7 @@ import { Typography } from '@mui/material';
 import { MobileDevice } from '@/components/mobile/MobileDevice';
 import { MobileSection } from '@/components/mobile/Section';
 import { MobileFieldFactory } from '@/features/Mobile/FieldFactory';
-import { MobilePreviewProps } from './types';
+import { MobilePreviewProps, FieldData } from './types';
 import { useFormBuilderContext } from './context/FormBuilderContext';
 import {
   MobilePreviewContainer,
@@ -63,13 +46,11 @@ export const MobilePreview: React.FC<MobilePreviewProps> = ({
 }) => {
   const { selectedFieldId } = useFormBuilderContext();
 
-  // Extract sections for expansion state
-  const sections = items
-    .filter((item) => item.type === 'section')
-    .map((item) => item.data);
+  // Extract sections for expansion state (sections are FieldData with type='SECTION')
+  const sections = items.filter((item) => item.type === 'SECTION');
 
   const [expandedSections, setExpandedSections] = React.useState<Set<string>>(
-    new Set(sections.filter((s) => s.isExpanded).map((s) => s.id))
+    new Set(sections.filter((s) => s.isExpanded !== false).map((s) => s.id))
   );
 
   const handleSectionToggle = (sectionId: string) => {
@@ -111,21 +92,21 @@ export const MobilePreview: React.FC<MobilePreviewProps> = ({
           showBattery={true}
         >
           {items.map((item) => {
-            if (item.type === 'section') {
-              const section = item.data;
+            if (item.type === 'SECTION') {
+              // Render section with its children
+              const section = item;
               const isExpanded = expandedSections.has(section.id);
-              const completionText = calculateCompletion(section.fields);
+              const completionText = calculateCompletion(section.children ?? []);
 
-              // Regular section with name
               return (
                 <MobileSection
                   key={section.id}
-                  title={section.name}
+                  title={section.label}
                   completionText={completionText}
                   isExpanded={isExpanded}
                   onToggle={() => handleSectionToggle(section.id)}
                 >
-                  {section.fields.map((field) => (
+                  {(section.children ?? []).map((field) => (
                     <MobileFieldFactory
                       key={field.id}
                       field={{
@@ -134,7 +115,6 @@ export const MobilePreview: React.FC<MobilePreviewProps> = ({
                         dataType: field.type?.toUpperCase() || 'STRING',
                         fieldKey: field.key || field.label?.toLowerCase().replace(/\s+/g, '_'),
                         description: field.helpText || undefined,
-
                       }}
                       showActions={false}
                       showAttachments={false}
@@ -142,9 +122,9 @@ export const MobilePreview: React.FC<MobilePreviewProps> = ({
                   ))}
                 </MobileSection>
               );
-            } else if (item.type === 'field') {
+            } else {
               // Render standalone field at full width (no section container)
-              const field = item.data;
+              const field = item;
 
               return (
                 <MobileFieldFactory
@@ -161,8 +141,6 @@ export const MobilePreview: React.FC<MobilePreviewProps> = ({
                 />
               );
             }
-
-            return null;
           })}
 
           {items.length === 0 && (
