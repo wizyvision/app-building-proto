@@ -100,15 +100,16 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   return (
     <>
       {/* Drag Handle - Centered at top, appears on hover */}
-      <DragHandleWrapper isVisible={isHovered || isDragging}>
-        <DragIconContainer
-          {...dragHandleProps}
-          onClick={handleDragHandleClick}
-          aria-label="Drag to reorder section"
-        >
-          <DragIcon />
-        </DragIconContainer>
-      </DragHandleWrapper>
+      <div {...dragHandleProps}>
+        <DragHandleWrapper isVisible={isHovered || isDragging}>
+          <DragIconContainer
+            onClick={handleDragHandleClick}
+            aria-label="Drag to reorder section"
+          >
+            <DragIcon />
+          </DragIconContainer>
+        </DragHandleWrapper>
+      </div>
 
       {/* Header Container with controls */}
       <HeaderContainer onClick={onToggle}>

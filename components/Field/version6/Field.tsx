@@ -155,11 +155,13 @@ const FieldContent = ({
         onMouseLeave={() => setIsHovered(false)}
       >
       {/* Drag Handle Section - Only visible on hover */}
-      <DragHandleWrapper isVisible={isHovered || snapshot.isDragging}>
-        <DragIconContainer {...provided.dragHandleProps}>
-          <DragIcon />
-        </DragIconContainer>
-      </DragHandleWrapper>
+      <div {...provided.dragHandleProps}>
+        <DragHandleWrapper isVisible={isHovered || snapshot.isDragging}>
+          <DragIconContainer>
+            <DragIcon />
+          </DragIconContainer>
+        </DragHandleWrapper>
+      </div>
 
       {/* Content Section */}
       <ContentSection>
