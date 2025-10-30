@@ -66,7 +66,12 @@ export const DragHandleWrapper = styled(Box, {
   width: '100%',
 }));
 
-export const DragIconContainer = styled(Box)({
+export const DragIconContainer = styled(Box, {
+  shouldForwardProp: (prop) => {
+    // Forward all props including event handlers from dragHandleProps
+    return true;
+  },
+})({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
