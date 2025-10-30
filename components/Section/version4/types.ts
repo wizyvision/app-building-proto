@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { DraggableProvidedDragHandleProps } from '@hello-pangea/dnd';
 
 export interface SectionProps {
   id: string;
@@ -24,7 +23,6 @@ export interface SectionHeaderProps {
   onToggle: () => void;
   onRename: (newName: string) => void;
   onDelete?: () => void;
-  dragHandleProps?: DraggableProvidedDragHandleProps | null;
 }
 
 export interface SectionContentProps {

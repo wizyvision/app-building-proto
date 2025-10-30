@@ -58,7 +58,6 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   onToggle,
   onRename,
   onDelete,
-  dragHandleProps,
 }) => {
   const [editValue, setEditValue] = useState(name);
 
@@ -100,16 +99,14 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   return (
     <>
       {/* Drag Handle - Centered at top, appears on hover */}
-      <div {...dragHandleProps}>
-        <DragHandleWrapper isVisible={isHovered || isDragging}>
-          <DragIconContainer
-            onClick={handleDragHandleClick}
-            aria-label="Drag to reorder section"
-          >
-            <DragIcon />
-          </DragIconContainer>
-        </DragHandleWrapper>
-      </div>
+      <DragHandleWrapper isVisible={isHovered || isDragging}>
+        <DragIconContainer
+          onClick={handleDragHandleClick}
+          aria-label="Drag to reorder section"
+        >
+          <DragIcon />
+        </DragIconContainer>
+      </DragHandleWrapper>
 
       {/* Header Container with controls */}
       <HeaderContainer onClick={onToggle}>

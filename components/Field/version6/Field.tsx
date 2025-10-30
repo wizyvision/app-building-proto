@@ -142,6 +142,7 @@ const FieldContent = ({
     <div
       ref={provided.innerRef}
       {...provided.draggableProps}
+      {...provided.dragHandleProps}
       style={{
         ...provided.draggableProps.style,
         opacity: snapshot.isDragging ? 0.8 : 1,
@@ -154,14 +155,12 @@ const FieldContent = ({
         isDragOver={snapshot.draggingOver ? true : false}
         isSelected={isSelected}
       >
-        {/* Drag Handle Section - Only visible on hover */}
-        <div {...provided.dragHandleProps}>
-          <DragHandleWrapper isVisible={isHovered || snapshot.isDragging}>
-            <DragIconContainer>
-              <DragIcon />
-            </DragIconContainer>
-          </DragHandleWrapper>
-        </div>
+        {/* Drag Handle Icon - Only visible on hover */}
+        <DragHandleWrapper isVisible={isHovered || snapshot.isDragging}>
+          <DragIconContainer>
+            <DragIcon />
+          </DragIconContainer>
+        </DragHandleWrapper>
 
         {/* Content Section */}
         <ContentSection>

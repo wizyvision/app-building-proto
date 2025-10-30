@@ -74,6 +74,7 @@ const SectionContentRender = ({
     <div
       ref={provided.innerRef}
       {...provided.draggableProps}
+      {...provided.dragHandleProps}
       style={{
         ...provided.draggableProps.style,
         opacity: snapshot.isDragging ? 0.6 : 1,
@@ -93,7 +94,6 @@ const SectionContentRender = ({
           onToggle={onToggle}
           onRename={onRename}
           onDelete={onDelete}
-          dragHandleProps={provided.dragHandleProps}
         />
         {React.isValidElement(children)
           ? React.cloneElement(children as React.ReactElement<any>, {
