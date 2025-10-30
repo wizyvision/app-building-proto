@@ -76,7 +76,7 @@ const SectionContentRender = ({
       {...provided.draggableProps}
       style={{
         ...provided.draggableProps.style,
-        opacity: snapshot.isDragging ? 0 : 1,
+        opacity: snapshot.isDragging ? 0.6 : 1,
       }}
     >
       <SectionWrapper

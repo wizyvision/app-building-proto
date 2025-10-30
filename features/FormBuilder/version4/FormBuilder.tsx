@@ -157,9 +157,13 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
   /**
    * Drag End Handler - hello-pangea/dnd pattern
+   *
+   * Determines drag type from draggableId format:
+   * - Sections: draggableId = "section-${id}"
+   * - Fields: draggableId = "field:${sectionId}:${id}" or "field:standalone:${id}"
    */
   const handleDragEnd = (result: DropResult) => {
-    const { source, destination, draggableId, type } = result;
+    const { source, destination, draggableId } = result;
 
     if (!destination) {
       return; // Dropped outside droppable
@@ -169,21 +173,37 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
       return; // Dropped in same position
     }
 
+    // Determine drag type from draggableId format
+    const isSection = draggableId.startsWith('section-');
+    const isField = draggableId.startsWith('field:');
+
     console.log('🔴 DRAG END:', {
       draggableId,
-      type,
+      dragType: isSection ? 'SECTION' : isField ? 'FIELD' : 'UNKNOWN',
       source: source.droppableId,
       sourceIndex: source.index,
       dest: destination.droppableId,
       destIndex: destination.index,
     });
 
-    // Handle section drag
-    if (type === 'SECTION') {
+    // Validate drop targets
+    if (isSection) {
+      // Sections can only drop in sections-droppable
+      if (destination.droppableId !== 'sections-droppable') {
+        console.log('❌ Invalid drop: Section dropped outside sections-droppable');
+        return;
+      }
       handleSectionMove(source.index, destination.index);
-    }
-    // Handle field drag
-    else if (type === 'FIELD') {
+    } else if (isField) {
+      // Fields can only drop in field droppables (fields-droppable-* or standalone-fields-droppable)
+      const isValidFieldDrop =
+        destination.droppableId.startsWith('fields-droppable-') ||
+        destination.droppableId === 'standalone-fields-droppable';
+
+      if (!isValidFieldDrop) {
+        console.log('❌ Invalid drop: Field dropped in invalid zone');
+        return;
+      }
       handleFieldMove(draggableId, source, destination);
     }
   };
