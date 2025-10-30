@@ -146,25 +146,25 @@ const FieldContent = ({
         ...provided.draggableProps.style,
         opacity: snapshot.isDragging ? 0.8 : 1,
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <AdminFieldContainer
         isGhost={snapshot.isDragging}
         isDragOver={snapshot.draggingOver ? true : false}
         isSelected={isSelected}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
-      {/* Drag Handle Section - Only visible on hover */}
-      <div {...provided.dragHandleProps}>
-        <DragHandleWrapper isVisible={isHovered || snapshot.isDragging}>
-          <DragIconContainer>
-            <DragIcon />
-          </DragIconContainer>
-        </DragHandleWrapper>
-      </div>
+        {/* Drag Handle Section - Only visible on hover */}
+        <div {...provided.dragHandleProps}>
+          <DragHandleWrapper isVisible={isHovered || snapshot.isDragging}>
+            <DragIconContainer>
+              <DragIcon />
+            </DragIconContainer>
+          </DragHandleWrapper>
+        </div>
 
-      {/* Content Section */}
-      <ContentSection>
+        {/* Content Section */}
+        <ContentSection>
         <ContentContainer>
           {/* Field Type Icon */}
           {IconComponent && (

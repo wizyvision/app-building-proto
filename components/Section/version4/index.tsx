@@ -78,11 +78,10 @@ const SectionContentRender = ({
         ...provided.draggableProps.style,
         opacity: snapshot.isDragging ? 0.6 : 1,
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <SectionWrapper
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+      <SectionWrapper>
         <SectionCard>
         <SectionHeader
           name={name}
