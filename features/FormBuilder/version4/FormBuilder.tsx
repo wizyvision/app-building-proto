@@ -195,10 +195,12 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
       }
       handleSectionMove(source.index, destination.index);
     } else if (isField) {
-      // Fields can only drop in field droppables (fields-droppable-* or standalone-fields-droppable)
+      // Fields can drop in:
+      // 1. field droppables (fields-droppable-*) - within a section
+      // 2. sections-droppable - as a standalone field at root level
       const isValidFieldDrop =
         destination.droppableId.startsWith('fields-droppable-') ||
-        destination.droppableId === 'standalone-fields-droppable';
+        destination.droppableId === 'sections-droppable';
 
       if (!isValidFieldDrop) {
         console.log('❌ Invalid drop: Field dropped in invalid zone');
@@ -234,8 +236,10 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
     const fieldId = parts[parts.length - 1]; // Last part is always the field ID
 
-    const isSourceStandalone = source.droppableId === 'standalone-fields-droppable';
-    const isDestStandalone = destination.droppableId === 'standalone-fields-droppable';
+    // Check if source/destination is the root sections droppable (standalone fields)
+    // or a section's field droppable
+    const isSourceStandalone = source.droppableId === 'sections-droppable';
+    const isDestStandalone = destination.droppableId === 'sections-droppable';
     const sourceSectionId = isSourceStandalone ? null : source.droppableId.replace('fields-droppable-', '');
     const destSectionId = isDestStandalone ? null : destination.droppableId.replace('fields-droppable-', '');
 
