@@ -248,8 +248,8 @@ export const AddFieldIcon = styled(AddIcon)(({ theme }) => ({
 // Empty state styles
 // Visual feedback when section has no fields
 export const EmptyState = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'isFieldDragging' && prop !== 'isEmptyOver',
-})<{ isFieldDragging?: boolean; isEmptyOver?: boolean }>(({ theme, isFieldDragging, isEmptyOver }) => ({
+  shouldForwardProp: (prop) => prop !== 'isFieldDragging',
+})<{ isFieldDragging?: boolean }>(({ theme, isFieldDragging }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -257,10 +257,10 @@ export const EmptyState = styled(Box, {
   color: theme.palette.text.secondary,
   fontSize: theme.typography.body2.fontSize,
   fontStyle: 'italic',
-  backgroundColor: isEmptyOver ? theme.palette.primary.lighter : theme.palette.background[3],
+  backgroundColor: theme.palette.background[3],
   borderRadius: theme.spacing(0.5),
   border: isFieldDragging ? '2px dashed' : '1px dashed',
-  borderColor: isEmptyOver ? theme.palette.primary.main : theme.palette.grey[300],
+  borderColor: isFieldDragging ? theme.palette.primary.main : theme.palette.grey[300],
   minHeight: isFieldDragging ? theme.spacing(10) : 'auto',
   transition: theme.transitions.create(['background-color', 'border-color', 'min-height'], {
     duration: theme.transitions.duration.shorter,

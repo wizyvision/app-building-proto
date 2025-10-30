@@ -3,7 +3,6 @@
 import React from 'react';
 import { Collapse } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { useDroppable } from '@dnd-kit/core';
 import { SectionContentProps } from './types';
 import {
   ContentContainer,
@@ -43,15 +42,6 @@ export const SectionContent: React.FC<SectionContentProps> = ({
 }) => {
   const shouldCollapse = isSectionDragging || isAnySectionDragging;
 
-  // Empty section drop zone
-  const { setNodeRef: setEmptyDropRef, isOver: isEmptyOver } = useDroppable({
-    id: `empty-section-${sectionId}`,
-    data: {
-      type: 'field-drop-end',
-      sectionId,
-    },
-  });
-
   // When any section is dragging, hide content completely (show only header)
   if (shouldCollapse) {
     return null;
@@ -73,9 +63,7 @@ export const SectionContent: React.FC<SectionContentProps> = ({
           {/* Empty State or Fields */}
           {!hasFields ? (
             <EmptyState
-              ref={setEmptyDropRef}
               isFieldDragging={isFieldDragging}
-              isEmptyOver={isEmptyOver}
             >
               {isFieldDragging ? (
                 'Drop field here'
